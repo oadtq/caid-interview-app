@@ -86,11 +86,16 @@ export function ResumeBuilder() {
   const [languages, setLanguages] = useState<Language[]>([])
   const [targetJobTitle, setTargetJobTitle] = useState('')
   const [targetIndustry, setTargetIndustry] = useState('')
-  const [showChatBox, setShowChatBox] = useState<string | null>(null)
-  const [chatInput, setChatInput] = useState('')
   const [selectedRole, setSelectedRole] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedResume, setGeneratedResume] = useState<any>(null)
+  const [isEnhancingDescription, setIsEnhancingDescription] = useState<string | null>(null)
+  const [previewExperienceId, setPreviewExperienceId] = useState<string | null>(null)
+  const [showTargetRoleWarning, setShowTargetRoleWarning] = useState(false)
+  const [previewEducationDetails, setPreviewEducationDetails] = useState<string | null>(null)
+  const [previewEducationId, setPreviewEducationId] = useState<string | null>(null)
+  const [isEnhancingEducation, setIsEnhancingEducation] = useState<string | null>(null)
+  const [previewDescriptions, setPreviewDescriptions] = useState<{ [key: string]: string | null }>({})
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -228,30 +233,59 @@ export function ResumeBuilder() {
   }
 
   const handleChatSubmit = async (experienceId: string) => {
-    if (!chatInput.trim()) return
+    const currentDescription = workExperiences.find(exp => exp.id === experienceId)?.description || ''
+    if (!currentDescription.trim()) return
+
+    // Check if target role is set
+    if (!targetJobTitle.trim()) {
+      setShowTargetRoleWarning(true)
+      return
+    }
+
+    setIsEnhancingDescription(experienceId)
+    console.log('Submitting description for enhancement:', currentDescription)
+    console.log('Experience ID:', experienceId)
 
     try {
+      const requestBody = {
+        description: currentDescription,
+        jobTitle: workExperiences.find(exp => exp.id === experienceId)?.jobTitle || '',
+        company: workExperiences.find(exp => exp.id === experienceId)?.companyName || '',
+        targetRole: targetJobTitle || ''
+      }
+      
+      console.log('Request body:', requestBody)
+
       const response = await fetch('/api/resume/enhance-description', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          description: chatInput,
-          jobTitle: workExperiences.find(exp => exp.id === experienceId)?.jobTitle || '',
-          companyName: workExperiences.find(exp => exp.id === experienceId)?.companyName || ''
-        }),
+        body: JSON.stringify(requestBody),
       })
+
+      console.log('Response status:', response.status)
 
       if (response.ok) {
         const result = await response.json()
-        updateWorkExperience(experienceId, 'description', result.enhancedDescription)
+        console.log('API response:', result)
+        setPreviewDescriptions(prev => ({
+          ...prev,
+          [experienceId]: result.enhanced_description
+        }))
+        setPreviewExperienceId(experienceId)
       } else {
+        const errorText = await response.text()
+        console.error('API error:', errorText)
         // Fallback to mock enhancement
         const enhancedDescription = `• Accomplished significant improvements in team productivity as measured by 25% reduction in project delivery time, by implementing agile methodologies and cross-functional collaboration
 • Delivered high-quality software solutions as measured by 99.5% uptime and zero critical bugs, by establishing comprehensive testing protocols and code review processes
 • Led strategic initiatives as measured by $2M cost savings annually, by optimizing system architecture and automating manual processes`
-        updateWorkExperience(experienceId, 'description', enhancedDescription)
+        setPreviewDescriptions(prev => ({
+          ...prev,
+          [experienceId]: enhancedDescription
+        }))
+        setPreviewExperienceId(experienceId)
       }
     } catch (error) {
       console.error('Error enhancing description:', error)
@@ -259,11 +293,14 @@ export function ResumeBuilder() {
       const enhancedDescription = `• Accomplished significant improvements in team productivity as measured by 25% reduction in project delivery time, by implementing agile methodologies and cross-functional collaboration
 • Delivered high-quality software solutions as measured by 99.5% uptime and zero critical bugs, by establishing comprehensive testing protocols and code review processes
 • Led strategic initiatives as measured by $2M cost savings annually, by optimizing system architecture and automating manual processes`
-      updateWorkExperience(experienceId, 'description', enhancedDescription)
+      setPreviewDescriptions(prev => ({
+        ...prev,
+        [experienceId]: enhancedDescription
+      }))
+      setPreviewExperienceId(experienceId)
+    } finally {
+      setIsEnhancingDescription(null)
     }
-
-    setShowChatBox(null)
-    setChatInput('')
   }
 
   const generateOutput = async () => {
@@ -271,13 +308,43 @@ export function ResumeBuilder() {
 
     try {
       const resumeData = {
-        workExperiences,
-        education,
-        certifications,
-        skills: skills.filter(skill => skill.skill.trim()),
-        languages,
-        targetJobTitle,
-        targetIndustry
+        personalInfo: {
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          location: '',
+          linkedin: '',
+          website: ''
+        },
+        experience: workExperiences.map(exp => ({
+          jobTitle: exp.jobTitle,
+          company: exp.companyName,
+          location: `${exp.city}, ${exp.country}`,
+          startDate: `${exp.startMonth} ${exp.startYear}`,
+          endDate: exp.isCurrentRole ? 'Present' : `${exp.endMonth} ${exp.endYear}`,
+          description: exp.description
+        })),
+        education: education.map(edu => ({
+          degree: edu.degreeProgram,
+          fieldOfStudy: edu.fieldOfStudy,
+          institution: edu.school,
+          graduationYear: edu.graduationYear,
+          gpa: '',
+          relevantCoursework: edu.additionalDetails
+        })),
+        skills: skills.filter(skill => skill.skill.trim()).map(s => s.skill),
+        certifications: certifications.map(cert => ({
+          name: cert.name,
+          issuer: cert.issuer,
+          year: cert.year
+        })),
+        languages: languages.map(lang => ({
+          language: lang.language,
+          proficiency: lang.proficiency
+        })),
+        targetJob: targetJobTitle,
+        targetIndustry: targetIndustry
       }
 
       const response = await fetch('/api/resume/generate', {
@@ -354,6 +421,95 @@ export function ResumeBuilder() {
     return roleSkillSuggestions[selectedRole as keyof typeof roleSkillSuggestions] || []
   }
 
+  const handleAcceptPreview = () => {
+    if (previewExperienceId && previewDescriptions[previewExperienceId]) {
+      updateWorkExperience(previewExperienceId, 'description', previewDescriptions[previewExperienceId] || '')
+      setPreviewDescriptions(prev => ({ ...prev, [previewExperienceId]: null }))
+      setPreviewExperienceId(null)
+      // Keep the chat box open - don't close it
+      // setShowChatBox(null) - removed this line
+      // setChatInputs(prev => ({ ...prev, [previewExperienceId]: '' })) - removed this line
+    }
+  }
+
+  const handleDeclinePreview = () => {
+    if (previewExperienceId) {
+      setPreviewDescriptions(prev => ({ ...prev, [previewExperienceId]: null }))
+      setPreviewExperienceId(null)
+    }
+  }
+
+  const handleEducationEnhancement = async (educationId: string) => {
+    const educationItem = education.find((edu: Education) => edu.id === educationId)
+    if (!educationItem) return
+
+    // Check if target role is set
+    if (!targetJobTitle.trim()) {
+      setShowTargetRoleWarning(true)
+      return
+    }
+
+    setIsEnhancingEducation(educationId)
+
+    try {
+      const requestBody = {
+        description: educationItem.additionalDetails || '',
+        degreeProgram: educationItem.degreeProgram || '',
+        fieldOfStudy: educationItem.fieldOfStudy || '',
+        school: educationItem.school || '',
+        targetRole: targetJobTitle || ''
+      }
+
+      const response = await fetch('/api/resume/enhance-education', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setPreviewEducationDetails(result.enhanced_description)
+        setPreviewEducationId(educationId)
+      } else {
+        // Fallback to mock enhancement
+        const enhancedDescription = `• Graduated with distinction, maintaining a 3.8 GPA while balancing academic excellence with leadership roles in student organizations
+• Completed comprehensive coursework in ${educationItem.fieldOfStudy || 'relevant field'}, including advanced projects that demonstrated practical application of theoretical concepts
+• Served as ${educationItem.degreeProgram || 'Student'} representative, organizing academic events and mentoring junior students
+• Participated in research projects and internships that provided hands-on experience in ${targetJobTitle || 'the field'}`
+
+        setPreviewEducationDetails(enhancedDescription)
+        setPreviewEducationId(educationId)
+      }
+    } catch (error) {
+      console.error('Error enhancing education:', error)
+      // Fallback to mock enhancement
+      const enhancedDescription = `• Graduated with distinction, maintaining a 3.8 GPA while balancing academic excellence with leadership roles in student organizations
+• Completed comprehensive coursework in ${educationItem.fieldOfStudy || 'relevant field'}, including advanced projects that demonstrated practical application of theoretical concepts
+• Served as ${educationItem.degreeProgram || 'Student'} representative, organizing academic events and mentoring junior students
+• Participated in research projects and internships that provided hands-on experience in ${targetJobTitle || 'the field'}`
+
+      setPreviewEducationDetails(enhancedDescription)
+      setPreviewEducationId(educationId)
+    } finally {
+      setIsEnhancingEducation(null)
+    }
+  }
+
+  const handleAcceptEducationPreview = () => {
+    if (previewEducationId && previewEducationDetails) {
+      updateEducation(previewEducationId, 'additionalDetails', previewEducationDetails)
+      setPreviewEducationDetails(null)
+      setPreviewEducationId(null)
+    }
+  }
+
+  const handleDeclineEducationPreview = () => {
+    setPreviewEducationDetails(null)
+    setPreviewEducationId(null)
+  }
+
   if (currentStep === 'output') {
     return (
       <div className="container mx-auto px-6 py-8">
@@ -371,14 +527,14 @@ export function ResumeBuilder() {
             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-blue-600" />
-                Summary
+                Professional Summary
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <p className="text-gray-700 leading-relaxed">
-                  {generatedResume?.summary || `Results-driven ${targetJobTitle || 'Professional'} with extensive experience in ${targetIndustry || 'various industries'}. Proven track record of delivering scalable solutions that improved system performance and reduced operational costs. Skilled in ${skills.slice(0, 3).map(s => s.skill).join(', ')} and committed to driving innovation and excellence.`}
+                  {generatedResume?.generatedContent?.professional_summary || `Results-driven ${targetJobTitle || 'Professional'} with extensive experience in ${targetIndustry || 'various industries'}. Proven track record of delivering scalable solutions that improved system performance and reduced operational costs. Skilled in ${skills.slice(0, 3).map(s => s.skill).join(', ')} and committed to driving innovation and excellence.`}
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={() => copyToClipboard(generatedResume?.summary || "")}>
+              <Button variant="outline" size="sm" onClick={() => copyToClipboard(generatedResume?.generatedContent?.professional_summary || "")}>
                 <Copy className="h-4 w-4 mr-2" />
                 Copy
               </Button>
@@ -391,9 +547,26 @@ export function ResumeBuilder() {
                 Core Competencies
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <p className="text-gray-700">
-                  {skills.filter(s => s.skill.trim()).map(s => `• ${s.skill}`).join(' ')}
-                </p>
+                {generatedResume?.generatedContent?.core_competencies ? (
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Technical Skills</h4>
+                      <p className="text-gray-700">{generatedResume.generatedContent.core_competencies.technical_skills?.join(' • ') || skills.filter(s => s.skill.trim()).map(s => s.skill).join(' • ')}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Soft Skills</h4>
+                      <p className="text-gray-700">{generatedResume.generatedContent.core_competencies.soft_skills?.join(' • ') || ''}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Industry-Specific Skills</h4>
+                      <p className="text-gray-700">{generatedResume.generatedContent.core_competencies.industry_specific?.join(' • ') || ''}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-700">
+                    {skills.filter(s => s.skill.trim()).map(s => `• ${s.skill}`).join(' ')}
+                  </p>
+                )}
               </div>
               <Button variant="outline" size="sm" onClick={() => copyToClipboard(skills.filter(s => s.skill.trim()).map(s => s.skill).join(' • '))}>
                 <Copy className="h-4 w-4 mr-2" />
@@ -405,22 +578,48 @@ export function ResumeBuilder() {
             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-blue-600" />
-                Experience
+                Professional Experience
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <div className="space-y-6">
-                  {workExperiences.filter(exp => exp.jobTitle && exp.companyName).map((exp, index) => (
-                    <div key={exp.id}>
-                      <h4 className="font-semibold text-gray-900">
-                        {exp.companyName} — {exp.jobTitle} ({exp.startMonth} {exp.startYear} – {exp.isCurrentRole ? 'Present' : `${exp.endMonth} ${exp.endYear}`})
-                      </h4>
-                      {exp.description && (
-                        <div className="mt-2 text-gray-700 whitespace-pre-line">
-                          {exp.description}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  {generatedResume?.generatedContent?.experience ? (
+                    generatedResume.generatedContent.experience.map((exp: any, index: number) => (
+                      <div key={index}>
+                        <h4 className="font-semibold text-gray-900">
+                          {exp.company} — {exp.jobTitle} ({exp.startDate} – {exp.endDate})
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-2">{exp.location}</p>
+                        {exp.enhanced_description && (
+                          <div className="mt-2 text-gray-700 whitespace-pre-line">
+                            {exp.enhanced_description}
+                          </div>
+                        )}
+                        {exp.key_achievements && exp.key_achievements.length > 0 && (
+                          <div className="mt-2">
+                            <h5 className="font-medium text-gray-900 mb-1">Key Achievements:</h5>
+                            <ul className="list-disc list-inside text-gray-700 space-y-1">
+                              {exp.key_achievements.map((achievement: string, idx: number) => (
+                                <li key={idx}>{achievement}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    workExperiences.filter(exp => exp.jobTitle && exp.companyName).map((exp, index) => (
+                      <div key={exp.id}>
+                        <h4 className="font-semibold text-gray-900">
+                          {exp.companyName} — {exp.jobTitle} ({exp.startMonth} {exp.startYear} – {exp.isCurrentRole ? 'Present' : `${exp.endMonth} ${exp.endYear}`})
+                        </h4>
+                        {exp.description && (
+                          <div className="mt-2 text-gray-700 whitespace-pre-line">
+                            {exp.description}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
               <Button variant="outline" size="sm" onClick={() => copyToClipboard(workExperiences.map(exp => `${exp.companyName} — ${exp.jobTitle}\n${exp.description}`).join('\n\n'))}>
@@ -521,6 +720,48 @@ export function ResumeBuilder() {
         </div>
 
         <div className="space-y-8">
+          {/* Target Role Warning */}
+          {showTargetRoleWarning && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-sm font-bold">!</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-amber-900 mb-1">Target Job Title Required</h3>
+                  <p className="text-amber-800 text-sm mb-3">
+                    Please set a Target Job Title in the "Tailor To Job" section before using AI enhancement. This helps the AI provide more relevant and targeted improvements.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => setShowTargetRoleWarning(false)}
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      Got it
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowTargetRoleWarning(false)
+                        // Scroll to Tailor To Job section
+                        document.getElementById('tailor-to-job')?.scrollIntoView({ behavior: 'smooth' })
+                      }}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                    >
+                      Go to Tailor To Job
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Work Experience Section */}
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
@@ -587,7 +828,7 @@ export function ResumeBuilder() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                           {countries.map(country => (
                             <SelectItem key={country} value={country}>{country}</SelectItem>
                           ))}
@@ -620,7 +861,7 @@ export function ResumeBuilder() {
                         <SelectTrigger>
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                           {years.map(year => (
                             <SelectItem key={year} value={year}>{year}</SelectItem>
                           ))}
@@ -654,7 +895,7 @@ export function ResumeBuilder() {
                         <SelectTrigger>
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                           {years.map(year => (
                             <SelectItem key={year} value={year}>{year}</SelectItem>
                           ))}
@@ -675,71 +916,80 @@ export function ResumeBuilder() {
                     </label>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowChatBox(exp.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                      Next: Add Details
-                    </Button>
-                  </div>
-
-                  {/* Chat Box */}
-                  <AnimatePresence key={`chatbox-${exp.id}`}>
-                    {showChatBox === exp.id && (
-                      <motion.div
-                        key={`chat-content-${exp.id}`}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-4 border border-blue-200 rounded-lg p-4 bg-blue-50"
+                  {/* Always visible details section */}
+                  <div className="col-span-2">
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">Job Description & Achievements</Label>
+                    <div className="relative">
+                      <Textarea 
+                        placeholder={`• Describe your key responsibilities and achievements in this role
+• Use the format: Accomplished [X] as measured by [Y], by doing [Z]
+• Include quantifiable results, metrics, and impact
+• Focus on achievements rather than just responsibilities`}
+                        value={exp.description}
+                        onChange={(e) => updateWorkExperience(exp.id, 'description', e.target.value)}
+                        className="min-h-[120px] pr-32"
+                      />
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleChatSubmit(exp.id)}
+                        disabled={isEnhancingDescription === exp.id}
+                        className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white"
                       >
-                        <div className="flex items-start gap-3 mb-4">
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                            <MessageCircle className="h-4 w-4 text-white" />
+                        {isEnhancingDescription === exp.id ? (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 animate-spin" />
+                            Enhancing...
                           </div>
-                          <div className="flex-1">
-                            <Textarea
-                              placeholder="Describe your responsibilities and achievements in this role."
-                              value={chatInput}
-                              onChange={(e) => setChatInput(e.target.value)}
-                              className="mb-2 bg-white"
-                            />
-                            <p className="text-sm text-gray-600 italic mb-4">
-                              Tip: Use the format — Accomplished [X] as measured by [Y], by doing [Z].
-                            </p>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                onClick={() => handleChatSubmit(exp.id)}
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
-                                <Sparkles className="h-4 w-4 mr-2" />
-                                Refine with AI
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                onClick={() => setShowChatBox(null)}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <Sparkles className="h-4 w-4" />
+                            Improve with AI
                           </div>
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* Preview AI-enhanced description */}
+                    {previewDescriptions[exp.id] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                      >
+                        <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                          <Sparkles className="h-4 w-4" />
+                          AI-Enhanced Description Preview
+                        </h4>
+                        <div className="text-sm text-blue-800 whitespace-pre-line mb-4">
+                          {previewDescriptions[exp.id]}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            onClick={() => {
+                              updateWorkExperience(exp.id, 'description', previewDescriptions[exp.id] || '');
+                              setPreviewDescriptions(prev => ({ ...prev, [exp.id]: null }));
+                              setPreviewExperienceId(null);
+                              // Keep the chat box open - don't close it
+                              // setShowChatBox(null); - removed this line
+                              // setChatInputs(prev => ({ ...prev, [exp.id]: '' })) - removed this line
+                            }}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Accept & Apply
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => setPreviewDescriptions(prev => ({ ...prev, [exp.id]: null }))}
+                            className="border-red-300 text-red-700 hover:bg-red-50"
+                          >
+                            Decline
+                          </Button>
                         </div>
                       </motion.div>
                     )}
-                  </AnimatePresence>
-
-                  {/* Display refined description */}
-                  {exp.description && (
-                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h4 className="font-medium text-green-900 mb-2">AI-Optimized Description:</h4>
-                      <div className="text-sm text-green-800 whitespace-pre-line">{exp.description}</div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -825,7 +1075,7 @@ export function ResumeBuilder() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select an option" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                           {years.map(year => (
                             <SelectItem key={year} value={year}>{year}</SelectItem>
                           ))}
@@ -843,12 +1093,57 @@ export function ResumeBuilder() {
                         />
                         <Button 
                           size="sm" 
+                          onClick={() => handleEducationEnhancement(edu.id)}
+                          disabled={isEnhancingEducation === edu.id}
                           className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white"
                         >
-                          <Sparkles className="h-4 w-4 mr-1" />
-                          Improve with AI
+                          {isEnhancingEducation === edu.id ? (
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4 animate-spin" />
+                              Enhancing...
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <Sparkles className="h-4 w-4" />
+                              Improve with AI
+                            </div>
+                          )}
                         </Button>
                       </div>
+
+                      {/* Preview AI-enhanced education details */}
+                      {previewEducationDetails && previewEducationId === edu.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                        >
+                          <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                            <Sparkles className="h-4 w-4" />
+                            AI-Enhanced Education Details Preview
+                          </h4>
+                          <div className="text-sm text-blue-800 whitespace-pre-line mb-4">
+                            {previewEducationDetails}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              onClick={handleAcceptEducationPreview}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              Accept & Apply
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={handleDeclineEducationPreview}
+                              className="border-red-300 text-red-700 hover:bg-red-50"
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -911,7 +1206,7 @@ export function ResumeBuilder() {
                           <SelectTrigger>
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                             {years.map(year => (
                               <SelectItem key={year} value={year}>{year}</SelectItem>
                             ))}
@@ -975,7 +1270,7 @@ export function ResumeBuilder() {
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a role to get skill recommendations" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                       {popularRoles.map(role => (
                         <SelectItem key={role} value={role}>{role}</SelectItem>
                       ))}
@@ -1070,7 +1365,7 @@ export function ResumeBuilder() {
           </div>
 
           {/* Tailor to Job Section */}
-          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm" id="tailor-to-job">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Tailor To Job</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -1087,7 +1382,7 @@ export function ResumeBuilder() {
                   <SelectTrigger>
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-[200px] z-[100]" position="popper" side="bottom" align="start">
                     {industries.map(industry => (
                       <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                     ))}

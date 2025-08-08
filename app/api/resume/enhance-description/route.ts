@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
   try {
     const { description, jobTitle, company, targetRole } = await request.json()
 
+    console.log('API received:', { description, jobTitle, company, targetRole })
+
     if (!description) {
       return NextResponse.json(
         { error: 'Description is required' },
@@ -40,6 +42,8 @@ Respond with a JSON object:
 }
 `
 
+    console.log('Sending prompt to OpenAI')
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -56,11 +60,15 @@ Respond with a JSON object:
       max_tokens: 1000
     })
 
+    console.log('OpenAI response received')
+
     let enhancedContent
     try {
       enhancedContent = JSON.parse(completion.choices[0].message.content || '{}')
+      console.log('Parsed enhanced content:', enhancedContent)
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
+      console.error('Raw response:', completion.choices[0].message.content)
       return NextResponse.json(
         { error: 'Failed to enhance description' },
         { status: 500 }

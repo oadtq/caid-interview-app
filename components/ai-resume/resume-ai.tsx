@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { Upload, FileText, Zap, Target, CheckCircle, ArrowRight, Sparkles, Clock, TrendingUp, X, AlertCircle } from 'lucide-react'
 import Image from "next/image"
