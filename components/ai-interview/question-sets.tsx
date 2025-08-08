@@ -3,8 +3,11 @@
 import { useState } from "react"
 import { Globe, Building2, Target, GraduationCap, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export function QuestionSets() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [expandedCards, setExpandedCards] = useState<number[]>([])
 
   const toggleCard = (cardId: number) => {
@@ -146,7 +149,14 @@ export function QuestionSets() {
                   </div>
 
                   {/* CTA Button */}
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                    onClick={() => {
+                      const current = new URLSearchParams(Array.from(searchParams.entries()))
+                      current.set("tab", "practice")
+                      router.push(`?${current.toString()}`)
+                    }}
+                  >
                     ➤ Practice with These Questions
                   </Button>
                 </div>

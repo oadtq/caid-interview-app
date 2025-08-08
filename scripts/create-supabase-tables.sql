@@ -173,3 +173,18 @@ CREATE INDEX IF NOT EXISTS idx_interview_sessions_question_set_id ON interview_s
 CREATE INDEX IF NOT EXISTS idx_interview_responses_session_id ON interview_responses(session_id);
 CREATE INDEX IF NOT EXISTS idx_resume_scans_created_at ON resume_scans(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_cover_letters_created_at ON cover_letters(created_at DESC);
+
+-- Ensure interview_sessions has all needed columns
+ALTER TABLE IF EXISTS interview_sessions
+  ADD COLUMN IF NOT EXISTS total_questions INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS completed_questions INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Ensure interview_responses has all needed columns
+ALTER TABLE IF EXISTS interview_responses
+  ADD COLUMN IF NOT EXISTS overall_score INTEGER,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Ensure question_sets.questions is JSONB (backfill if needed)
+ALTER TABLE IF EXISTS question_sets
+  ALTER COLUMN questions TYPE JSONB USING questions::jsonb;

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { InterviewHeader } from "@/components/ai-interview/interview-header"
 import { InterviewHome } from "@/components/ai-interview/interview-home"
 import { InterviewCurriculum } from "@/components/ai-interview/interview-curriculum"
@@ -10,7 +11,24 @@ import { QuestionSets } from "@/components/ai-interview/question-sets"
 import { Certificates } from "@/components/ai-interview/certificates"
 
 export default function AIInterviewPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("home")
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab")
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
+  useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()))
+    current.set("tab", activeTab)
+    router.replace(`?${current.toString()}`, { scroll: false })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab])
 
   const userInfo = {
     firstName: "Hoa",
@@ -35,7 +53,7 @@ export default function AIInterviewPage() {
       case "certificates":
         return <Certificates />
       case "practice":
-        return <Practice />
+        return <Practice onTabChange={setActiveTab} />
       case "videos":
         return <MyVideos />
       default:

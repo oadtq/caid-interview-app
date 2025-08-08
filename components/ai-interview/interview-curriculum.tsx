@@ -114,9 +114,13 @@ export function InterviewCurriculum() {
           <LessonItem key={lesson.id} lesson={lesson} />
         ))}
         <div className="pt-4">
-          <Button className="w-full bg-blue-600 hover:bg-blue-700">
-            Start Lesson
-          </Button>
+          <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => {
+             if (data.lessons && data.lessons.length > 0) {
+               handlePlayVideo(data.lessons[0].id)
+             }
+           }}>
+             Start Lesson
+           </Button>
         </div>
       </CardContent>
     </Card>

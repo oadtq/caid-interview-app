@@ -6,6 +6,26 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+async function ensureBucketExists(bucket: string) {
+  try {
+    const { data: bucketInfo } = await supabase.storage.getBucket(bucket)
+    if (!bucketInfo) {
+      const { error: createError } = await supabase.storage.createBucket(bucket, { public: true })
+      if (createError) throw createError
+    }
+  } catch (e) {
+    // Some self-hosted/storage versions may not support getBucket; fallback to create (idempotent)
+    const { data: list, error: listError } = await supabase.storage.listBuckets()
+    if (!listError) {
+      const exists = (list || []).some(b => b.name === bucket)
+      if (!exists) {
+        const { error: createError } = await supabase.storage.createBucket(bucket, { public: true })
+        if (createError) throw createError
+      }
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -22,13 +42,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const bucketName = 'interview-videos'
+    await ensureBucketExists(bucketName)
+
     // Generate unique filename
     const timestamp = Date.now()
     const filename = `${sessionId}/${questionId}_${timestamp}.webm`
 
     // Upload video to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('interview-videos')
+      .from(bucketName)
       .upload(filename, video, {
         contentType: 'video/webm',
         upsert: false
@@ -44,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('interview-videos')
+      .from(bucketName)
       .getPublicUrl(filename)
 
     // Create interview response record
@@ -69,18 +92,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Update session progress
-    const { error: updateError } = await supabase
+    // Fetch current count then increment (avoids supabase.sql usage)
+    const { data: existingSession, error: fetchSessionError } = await supabase
       .from('interview_sessions')
-      .update({ 
-        completed_questions: supabase.sql`completed_questions + 1`,
-        updated_at: new Date().toISOString()
-      })
+      .select('completed_questions')
       .eq('id', sessionId)
+      .single()
 
-    if (updateError) {
-      console.error('Session update error:', updateError)
+    if (!fetchSessionError) {
+      const nextCompleted = (existingSession?.completed_questions || 0) + 1
+      const { error: updateError } = await supabase
+        .from('interview_sessions')
+        .update({ 
+          completed_questions: nextCompleted,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', sessionId)
+      if (updateError) {
+        console.error('Session update error:', updateError)
+      }
     }
-
+ 
     return NextResponse.json({
       response,
       videoUrl: publicUrl
