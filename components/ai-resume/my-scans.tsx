@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FileText, Calendar, Download, Eye, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ChevronDown, ChevronUp, Target, Type, Layout, Shield } from 'lucide-react'
 
 interface ScanData {
@@ -67,245 +67,153 @@ export function MyScans() {
   const [selectedScan, setSelectedScan] = useState<ScanData | null>(null)
   const [activeTab, setActiveTab] = useState<"readability" | "credibility" | "atsfit" | "format">("readability")
   const [expandedCriteria, setExpandedCriteria] = useState<string[]>([])
+  const [scanHistory, setScanHistory] = useState<ScanData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Demo scan data
-  const scanHistory: ScanData[] = [
-    {
-      id: "1",
-      fileName: "John_Doe_Resume.pdf",
-      jobTitle: "Software Engineer",
-      company: "Google",
-      scanDate: "2024-01-15",
-      overallScore: 85,
-      status: "completed",
-      feedback: {
-        readability: {
-          score: 88,
-          metCriteria: 2,
-          totalCriteria: 4,
-          issues: [
-            {
-              name: "Summary Statement",
-              status: "error",
-              details: "Your summary statement needs improvement to better highlight your key qualifications.",
-              recommendations: [
-                "Include 2-3 key achievements with quantifiable results",
-                "Mention your years of experience and primary expertise",
-                "Align the summary with the target job requirements"
-              ]
-            },
-            {
-              name: "Spelling & Grammar",
-              status: "warning",
-              details: "Minor spelling and grammar issues detected that could impact readability.",
-              recommendations: [
-                "Use spell-check tools before submitting",
-                "Have someone proofread your resume",
-                "Pay attention to consistent verb tenses"
-              ]
-            },
-            {
-              name: "Contact Information",
-              status: "success",
-              details: "Perfect! You have included all of the required contact information details in your resume.",
-              recommendations: [
-                "Email", "Full Name", "City / State", "Phone Number", "LinkedIn Page"
-              ]
-            },
-            {
-              name: "Sections",
-              status: "success",
-              details: "Your resume sections are well-organized and follow standard formatting.",
-              recommendations: [
-                "Maintain consistent section headers",
-                "Keep sections in logical order",
-                "Use clear section dividers"
-              ]
-            }
-          ]
-        },
-        credibility: {
-          score: 92,
-          metCriteria: 5,
-          totalCriteria: 6,
-          issues: [
-            {
-              name: "Experience Chronological Order",
-              status: "error",
-              details: "Your work experience should be listed in reverse chronological order.",
-              recommendations: [
-                "List most recent position first",
-                "Ensure dates are accurate and consistent",
-                "Include month and year for each position"
-              ]
-            },
-            {
-              name: "Quantified Achievements",
-              status: "success",
-              details: "Excellent use of numbers and metrics to demonstrate impact.",
-              recommendations: []
-            },
-            {
-              name: "Action Verbs",
-              status: "success",
-              details: "Strong use of action verbs throughout your experience descriptions.",
-              recommendations: []
-            }
-          ]
-        },
-        atsfit: {
-          score: 78,
-          metCriteria: 4,
-          totalCriteria: 6,
-          issues: [
-            {
-              name: "Keyword Matching",
-              status: "warning",
-              details: "Your resume could benefit from more relevant keywords from the job description.",
-              recommendations: [
-                "Include more technical skills mentioned in job posting",
-                "Use industry-specific terminology",
-                "Match job title keywords where appropriate"
-              ]
-            },
-            {
-              name: "Job Title Match",
-              status: "error",
-              details: "Your current job titles don't closely match the target position.",
-              recommendations: [
-                "Consider adjusting job titles to be more relevant",
-                "Highlight transferable skills",
-                "Use keywords from target job description"
-              ]
-            }
-          ]
-        },
-        format: {
-          score: 82,
-          metCriteria: 3,
-          totalCriteria: 6,
-          issues: [
-            {
-              name: "Font Size & Choice",
-              status: "error",
-              details: "Font size and choice could be improved for better readability.",
-              recommendations: [
-                "Use 10-12pt font size for body text",
-                "Choose professional fonts like Arial, Calibri, or Times New Roman",
-                "Ensure consistent font usage throughout"
-              ]
-            },
-            {
-              name: "Line Spacing",
-              status: "error",
-              details: "Line spacing needs adjustment for optimal readability.",
-              recommendations: [
-                "Use 1.15-1.5 line spacing",
-                "Ensure consistent spacing between sections",
-                "Add appropriate white space around content"
-              ]
-            },
-            {
-              name: "Date Format",
-              status: "error",
-              details: "Date formatting is inconsistent throughout the resume.",
-              recommendations: [
-                "Use consistent date format (MM/YYYY or Month YYYY)",
-                "Align dates consistently",
-                "Include present for current positions"
-              ]
-            }
-          ]
-        }
+  useEffect(() => {
+    fetchScans()
+  }, [])
+
+  const fetchScans = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/resume/scans')
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch scans')
       }
-    },
-    {
-      id: "2",
-      fileName: "Jane_Smith_Resume.pdf",
-      jobTitle: "Product Manager",
-      company: "Microsoft",
-      scanDate: "2024-01-10",
-      overallScore: 92,
-      status: "completed",
-      feedback: {
-        readability: {
-          score: 95,
-          metCriteria: 4,
-          totalCriteria: 4,
-          issues: []
-        },
-        credibility: {
-          score: 90,
-          metCriteria: 5,
-          totalCriteria: 6,
-          issues: []
-        },
-        atsfit: {
-          score: 88,
-          metCriteria: 5,
-          totalCriteria: 6,
-          issues: []
-        },
-        format: {
-          score: 95,
-          metCriteria: 6,
-          totalCriteria: 6,
-          issues: []
+
+      const data = await response.json()
+      
+      // Transform database format to match the expected interface
+      const transformedScans: ScanData[] = data.scans.map((scan: any) => {
+        const aiFeedback = scan.ai_feedback || {}
+        
+        return {
+          id: scan.id,
+          fileName: scan.filename,
+          jobTitle: "Software Engineer", // Default for now
+          company: "Company", // Default for now
+          scanDate: new Date(scan.created_at).toLocaleDateString(),
+          overallScore: scan.overall_score || 0, // Use 1-10 scale directly
+          status: "completed" as const,
+          feedback: {
+            readability: {
+              score: aiFeedback.content_quality?.score || 0, // Use 1-10 scale directly
+              metCriteria: 2,
+              totalCriteria: 4,
+              issues: aiFeedback.content_quality?.categories?.map((category: any) => ({
+                name: category.name,
+                status: category.status as "error" | "warning" | "success",
+                details: category.details,
+                recommendations: category.recommendations
+              })) || []
+            },
+            credibility: {
+              score: aiFeedback.impact_achievements?.score || 0, // Use 1-10 scale directly
+              metCriteria: 3,
+              totalCriteria: 5,
+              issues: aiFeedback.impact_achievements?.categories?.map((category: any) => ({
+                name: category.name,
+                status: category.status as "error" | "warning" | "success",
+                details: category.details,
+                recommendations: category.recommendations
+              })) || []
+            },
+            atsfit: {
+              score: aiFeedback.keyword_optimization?.score || 0, // Use 1-10 scale directly
+              metCriteria: 2,
+              totalCriteria: 4,
+              issues: aiFeedback.keyword_optimization?.categories?.map((category: any) => ({
+                name: category.name,
+                status: category.status as "error" | "warning" | "success",
+                details: category.details,
+                recommendations: category.recommendations
+              })) || []
+            },
+            format: {
+              score: aiFeedback.formatting_structure?.score || 0, // Use 1-10 scale directly
+              metCriteria: 3,
+              totalCriteria: 4,
+              issues: aiFeedback.formatting_structure?.categories?.map((category: any) => ({
+                name: category.name,
+                status: category.status as "error" | "warning" | "success",
+                details: category.details,
+                recommendations: category.recommendations
+              })) || []
+            }
+          }
         }
-      }
-    },
-    {
-      id: "3",
-      fileName: "Alex_Johnson_Resume.pdf",
-      jobTitle: "Data Scientist",
-      company: "Meta",
-      scanDate: "2024-01-05",
-      overallScore: 76,
-      status: "completed",
-      feedback: {
-        readability: {
-          score: 72,
-          metCriteria: 2,
-          totalCriteria: 4,
-          issues: []
-        },
-        credibility: {
-          score: 85,
-          metCriteria: 4,
-          totalCriteria: 6,
-          issues: []
-        },
-        atsfit: {
-          score: 70,
-          metCriteria: 3,
-          totalCriteria: 6,
-          issues: []
-        },
-        format: {
-          score: 78,
-          metCriteria: 4,
-          totalCriteria: 6,
-          issues: []
-        }
-      }
+      })
+
+      setScanHistory(transformedScans)
+    } catch (error) {
+      console.error('Error fetching scans:', error)
+      setError('Failed to load scans')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return "text-green-600"
-    if (score >= 75) return "text-yellow-600"
+    if (score >= 9) return "text-green-600"
+    if (score >= 7) return "text-yellow-600"
     return "text-red-600"
   }
 
   const getScoreBg = (score: number) => {
-    if (score >= 90) return "bg-green-50 border-green-200"
-    if (score >= 75) return "bg-yellow-50 border-yellow-200"
+    if (score >= 9) return "bg-green-50 border-green-200"
+    if (score >= 7) return "bg-yellow-50 border-yellow-200"
     return "bg-red-50 border-red-200"
   }
 
-  const handleDelete = (scanId: string) => {
-    // Handle delete logic
-    console.log("Delete scan:", scanId)
+  const handleDelete = async (scanId: string) => {
+    if (!confirm('Are you sure you want to delete this scan? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/resume/scans/${scanId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete scan')
+      }
+
+      // Remove the scan from the local state
+      setScanHistory(prev => prev.filter(scan => scan.id !== scanId))
+    } catch (error) {
+      console.error('Error deleting scan:', error)
+      alert('Failed to delete scan. Please try again.')
+    }
+  }
+
+  const handleDownload = async (scanId: string) => {
+    try {
+      const response = await fetch(`/api/resume/scans/${scanId}/download`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to download scan')
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob()
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'resume_analysis.json'
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error downloading scan:', error)
+      alert('Failed to download scan. Please try again.')
+    }
   }
 
   const toggleCriteriaExpansion = (criteriaName: string) => {
@@ -411,20 +319,10 @@ export function MyScans() {
                   {currentFeedback.issues.map((issue, index) => (
                     <div
                       key={index}
-                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                        expandedCriteria.includes(issue.name)
-                          ? "bg-blue-50 border border-blue-200"
-                          : "hover:bg-gray-50"
-                      }`}
-                      onClick={() => toggleCriteriaExpansion(issue.name)}
+                      className="flex items-center gap-3 p-3 rounded-lg"
                     >
                       {getStatusIcon(issue.status)}
                       <span className="text-sm font-medium text-gray-900 flex-1">{issue.name}</span>
-                      {expandedCriteria.includes(issue.name) ? (
-                        <ChevronUp className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-gray-400" />
-                      )}
                     </div>
                   ))}
                 </div>
@@ -452,7 +350,7 @@ export function MyScans() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className={`text-3xl font-bold ${getScoreColor(currentFeedback.score)}`}>
-                        {currentFeedback.score}/100
+                        {currentFeedback.score}/10
                       </div>
                       <div className="text-gray-600 text-sm">
                         {currentFeedback.metCriteria} of {currentFeedback.totalCriteria} criteria meet the required scoring
@@ -460,8 +358,8 @@ export function MyScans() {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        {currentFeedback.score >= 90 ? "EXCELLENT!" : 
-                         currentFeedback.score >= 75 ? "GOOD WORK!" : "NEEDS IMPROVEMENT"}
+                        {currentFeedback.score >= 9 ? "EXCELLENT!" : 
+                         currentFeedback.score >= 7 ? "GOOD WORK!" : "NEEDS IMPROVEMENT"}
                       </div>
                     </div>
                   </div>
@@ -486,7 +384,7 @@ export function MyScans() {
                           
                           {issue.recommendations.length > 0 && (
                             <div className="mt-4">
-                              <h4 className="font-semibold text-green-800 mb-2">Included Contact Information</h4>
+                              <h4 className="font-semibold text-green-800 mb-2">Recommendations</h4>
                               <ul className="space-y-1">
                                 {issue.recommendations.map((rec, idx) => (
                                   <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
@@ -500,7 +398,7 @@ export function MyScans() {
                         </div>
                       )}
 
-                      {expandedCriteria.includes(issue.name) && issue.status !== "success" && (
+                      {issue.status !== "success" && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                           <div className="mb-3">
                             <p className="text-gray-700 text-sm">{issue.details}</p>
@@ -513,7 +411,6 @@ export function MyScans() {
                                   <CheckCircle className="h-4 w-4 text-blue-600" />
                                 </div>
                                 <span className="font-semibold text-blue-800">FOLLOW THESE BEST PRACTICES</span>
-                                <ChevronUp className="h-4 w-4 text-blue-600 ml-auto" />
                               </div>
                               <ul className="space-y-2">
                                 {issue.recommendations.map((rec, idx) => (
@@ -549,76 +446,116 @@ export function MyScans() {
           <p className="text-gray-600 text-lg">Review your resume scan history and track improvements</p>
         </div>
 
-        <div className="space-y-6">
-          {scanHistory.map((scan, index) => (
-            <motion.div
-              key={scan.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-            >
-              <Card3D>
-                <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-blue-50 rounded-lg">
-                        <FileText className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{scan.fileName}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                          <span>{scan.jobTitle} at {scan.company}</span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {new Date(scan.scanDate).toLocaleDateString()}
-                          </span>
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your scans...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+              <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Failed to Load Scans</h3>
+              <p className="text-red-700 mb-4">{error}</p>
+              <Button onClick={fetchScans} className="bg-red-600 hover:bg-red-700">
+                Try Again
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && scanHistory.length === 0 && (
+          <div className="text-center py-12">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-md mx-auto">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">No Scans Yet</h3>
+              <p className="text-gray-600 mb-4">Upload and scan your first resume to get started</p>
+              <Button onClick={() => window.location.href = '/ai-resume'} className="bg-blue-600 hover:bg-blue-700">
+                Scan Resume
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Scans List */}
+        {!loading && !error && scanHistory.length > 0 && (
+          <div className="space-y-6">
+            {scanHistory.map((scan, index) => (
+              <motion.div
+                key={scan.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                <Card3D>
+                  <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <FileText className="h-6 w-6 text-blue-600" />
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className={`text-2xl font-bold ${getScoreColor(scan.overallScore)}`}>
-                          {scan.overallScore}
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{scan.fileName}</h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                            <span>{scan.jobTitle} at {scan.company}</span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {scan.scanDate}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600">Overall Score</div>
                       </div>
                       
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedScan(scan)}
-                          className="flex items-center gap-2"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View Feedback
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center gap-2"
-                        >
-                          <Download className="h-4 w-4" />
-                          Download
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(scan.id)}
-                          className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </Button>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${getScoreColor(scan.overallScore)}`}>
+                            {scan.overallScore}
+                          </div>
+                          <div className="text-sm text-gray-600">Overall Score</div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedScan(scan)}
+                            className="flex items-center gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View Feedback
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownload(scan.id)}
+                            className="flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(scan.id)}
+                            className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card3D>
-            </motion.div>
-          ))}
-        </div>
+                </Card3D>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   )

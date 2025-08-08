@@ -31,7 +31,7 @@ export default function AIResumePage() {
       case "home":
         return <ResumeHome onGetStarted={() => setActiveTab("resume-ai")} />
       case "resume-ai":
-        return <ResumeAI />
+        return <ResumeAI setActiveTab={setActiveTab} />
       case "my-scans":
         return <MyScans />
       case "curriculum":

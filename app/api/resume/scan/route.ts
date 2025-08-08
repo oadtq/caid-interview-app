@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import OpenAI from 'openai'
 import { writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
@@ -82,12 +82,7 @@ Please provide a detailed analysis with scores (1-10) and specific feedback for 
 For each criterion, provide:
 - A numerical score (1-10)
 - Specific feedback explaining the score
-- 2-3 actionable recommendations for improvement
-
-Also provide:
-- Overall strengths (3-5 points)
-- Areas for improvement (3-5 points)
-- Overall summary and recommendations
+- Multiple specific feedback categories with recommendations
 
 Please respond in JSON format:
 {
@@ -95,22 +90,122 @@ Please respond in JSON format:
   "content_quality": {
     "score": number,
     "feedback": "detailed feedback",
-    "recommendations": ["rec 1", "rec 2", "rec 3"]
+    "categories": [
+      {
+        "name": "Summary Statement",
+        "status": "error|warning|success",
+        "details": "specific feedback about summary",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Work Experience",
+        "status": "error|warning|success", 
+        "details": "specific feedback about experience",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Skills Section",
+        "status": "error|warning|success",
+        "details": "specific feedback about skills",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Education",
+        "status": "error|warning|success",
+        "details": "specific feedback about education",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      }
+    ]
   },
   "formatting_structure": {
     "score": number,
-    "feedback": "detailed feedback", 
-    "recommendations": ["rec 1", "rec 2", "rec 3"]
+    "feedback": "detailed feedback",
+    "categories": [
+      {
+        "name": "Layout & Design",
+        "status": "error|warning|success",
+        "details": "specific feedback about layout",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Font & Typography",
+        "status": "error|warning|success",
+        "details": "specific feedback about fonts",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Spacing & Margins",
+        "status": "error|warning|success",
+        "details": "specific feedback about spacing",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Section Headers",
+        "status": "error|warning|success",
+        "details": "specific feedback about headers",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      }
+    ]
   },
   "keyword_optimization": {
     "score": number,
     "feedback": "detailed feedback",
-    "recommendations": ["rec 1", "rec 2", "rec 3"]
+    "categories": [
+      {
+        "name": "Technical Skills",
+        "status": "error|warning|success",
+        "details": "specific feedback about technical skills",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Industry Keywords",
+        "status": "error|warning|success",
+        "details": "specific feedback about industry terms",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Job Title Keywords",
+        "status": "error|warning|success",
+        "details": "specific feedback about job titles",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Action Verbs",
+        "status": "error|warning|success",
+        "details": "specific feedback about action verbs",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      }
+    ]
   },
   "impact_achievements": {
     "score": number,
     "feedback": "detailed feedback",
-    "recommendations": ["rec 1", "rec 2", "rec 3"]
+    "categories": [
+      {
+        "name": "Quantified Results",
+        "status": "error|warning|success",
+        "details": "specific feedback about metrics",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Project Impact",
+        "status": "error|warning|success",
+        "details": "specific feedback about project impact",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Leadership Examples",
+        "status": "error|warning|success",
+        "details": "specific feedback about leadership",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      },
+      {
+        "name": "Problem Solving",
+        "status": "error|warning|success",
+        "details": "specific feedback about problem solving",
+        "recommendations": ["rec 1", "rec 2", "rec 3"]
+      }
+    ]
   },
   "strengths": ["strength 1", "strength 2", "strength 3"],
   "areas_for_improvement": ["improvement 1", "improvement 2", "improvement 3"],
@@ -145,22 +240,122 @@ Please respond in JSON format:
         content_quality: { 
           score: 7, 
           feedback: "Good content with room for improvement.",
-          recommendations: ["Add more specific achievements", "Include relevant skills", "Quantify your impact"]
+          categories: [
+            {
+              name: "Summary Statement",
+              status: "warning",
+              details: "Your summary statement could be more specific and impactful.",
+              recommendations: ["Include 2-3 key achievements", "Mention years of experience", "Align with target role"]
+            },
+            {
+              name: "Work Experience",
+              status: "warning",
+              details: "Experience descriptions could be more quantified.",
+              recommendations: ["Add specific metrics", "Use action verbs", "Show impact of work"]
+            },
+            {
+              name: "Skills Section",
+              status: "success",
+              details: "Good variety of skills listed.",
+              recommendations: ["Keep current skills", "Add relevant certifications", "Update regularly"]
+            },
+            {
+              name: "Education",
+              status: "success",
+              details: "Education section is well presented.",
+              recommendations: ["Include GPA if high", "Add relevant coursework", "List certifications"]
+            }
+          ]
         },
         formatting_structure: { 
           score: 8, 
           feedback: "Well-structured resume.",
-          recommendations: ["Consistent formatting", "Clear section headers", "Proper spacing"]
+          categories: [
+            {
+              name: "Layout & Design",
+              status: "success",
+              details: "Clean and professional layout.",
+              recommendations: ["Maintain current design", "Ensure consistency", "Use white space effectively"]
+            },
+            {
+              name: "Font & Typography",
+              status: "warning",
+              details: "Font choices could be improved.",
+              recommendations: ["Use professional fonts", "Maintain consistent sizing", "Ensure readability"]
+            },
+            {
+              name: "Spacing & Margins",
+              status: "success",
+              details: "Good use of spacing throughout.",
+              recommendations: ["Keep current spacing", "Ensure consistent margins", "Use proper line spacing"]
+            },
+            {
+              name: "Section Headers",
+              status: "success",
+              details: "Clear section organization.",
+              recommendations: ["Maintain current headers", "Use consistent formatting", "Ensure logical flow"]
+            }
+          ]
         },
         keyword_optimization: { 
           score: 6, 
           feedback: "Could benefit from more industry keywords.",
-          recommendations: ["Research job descriptions", "Include technical skills", "Use industry terminology"]
+          categories: [
+            {
+              name: "Technical Skills",
+              status: "warning",
+              details: "Could include more technical keywords.",
+              recommendations: ["Add specific technologies", "Include programming languages", "List relevant tools"]
+            },
+            {
+              name: "Industry Keywords",
+              status: "warning",
+              details: "Missing some industry-specific terms.",
+              recommendations: ["Research job descriptions", "Include industry terminology", "Use relevant buzzwords"]
+            },
+            {
+              name: "Job Title Keywords",
+              status: "warning",
+              details: "Job titles could be more specific.",
+              recommendations: ["Use standard job titles", "Include relevant keywords", "Match target positions"]
+            },
+            {
+              name: "Action Verbs",
+              status: "success",
+              details: "Good use of action verbs.",
+              recommendations: ["Continue using strong verbs", "Vary your vocabulary", "Use present tense for current roles"]
+            }
+          ]
         },
         impact_achievements: { 
           score: 6, 
           feedback: "Achievements could be more quantified.",
-          recommendations: ["Use numbers and metrics", "Show results achieved", "Demonstrate value added"]
+          categories: [
+            {
+              name: "Quantified Results",
+              status: "warning",
+              details: "Need more specific metrics and numbers.",
+              recommendations: ["Add percentage improvements", "Include dollar amounts", "Show time savings"]
+            },
+            {
+              name: "Project Impact",
+              status: "warning",
+              details: "Project outcomes could be better described.",
+              recommendations: ["Describe project scope", "Show team size impact", "Highlight deliverables"]
+            },
+            {
+              name: "Leadership Examples",
+              status: "warning",
+              details: "Leadership experience could be emphasized more.",
+              recommendations: ["Highlight team management", "Show decision-making impact", "Include mentoring examples"]
+            },
+            {
+              name: "Problem Solving",
+              status: "success",
+              details: "Good examples of problem-solving skills.",
+              recommendations: ["Continue highlighting solutions", "Show analytical thinking", "Include innovative approaches"]
+            }
+          ]
         },
         strengths: ["Clear structure", "Professional appearance", "Relevant experience"],
         areas_for_improvement: ["Add more metrics", "Include keywords", "Strengthen achievements"],
@@ -173,8 +368,7 @@ Please respond in JSON format:
       .from('resume_scans')
       .insert({
         user_id: 'demo-user', // For MVP, using demo user
-        file_name: file.name,
-        file_size: file.size,
+        filename: file.name,
         extracted_text: extractedText,
         ai_feedback: aiFeedback,
         overall_score: aiFeedback.overall_score

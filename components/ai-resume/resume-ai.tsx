@@ -75,7 +75,7 @@ export function ResumeAI({ setActiveTab }: ResumeAIProps) {
 
     try {
       const formData = new FormData()
-      formData.append('resume', uploadedFile)
+      formData.append('file', uploadedFile)
 
       const response = await fetch('/api/resume/scan', {
         method: 'POST',

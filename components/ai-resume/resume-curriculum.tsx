@@ -72,7 +72,7 @@ export function ResumeCurriculum() {
     },
   ]
 
-  const transcriptContent = {
+  const transcriptContent: Record<number, { title: string; content: string[] }> = {
     0: {
       title: "Resume Essentials: Mastering Structure That Stands Out",
       content: [
@@ -87,7 +87,7 @@ export function ResumeCurriculum() {
     },
   }
 
-  const homeworkContent = {
+  const homeworkContent: Record<number, { title: string; assignments: { task: string; description: string; timeEstimate: string }[] }> = {
     0: {
       title: "Resume Essentials: Mastering Structure That Stands Out",
       assignments: [
@@ -196,7 +196,7 @@ export function ResumeCurriculum() {
                   <p className="text-gray-600">Follow along with the complete lesson content below.</p>
                 </div>
                 <div className="space-y-4 text-gray-700 leading-relaxed">
-                  {transcriptContent[currentLesson]?.content.map((paragraph, index) => (
+                  {transcriptContent[currentLesson]?.content.map((paragraph: string, index: number) => (
                     <p key={index} className="text-base">
                       {paragraph}
                     </p>
@@ -215,7 +215,7 @@ export function ResumeCurriculum() {
                 </div>
 
                 <div className="space-y-6">
-                  {homeworkContent[currentLesson]?.assignments.map((assignment, index) => (
+                  {homeworkContent[currentLesson]?.assignments.map((assignment: any, index: number) => (
                     <div
                       key={index}
                       className="border border-gray-200 rounded-lg p-6 hover:border-blue-200 transition-colors"
