@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import OpenAI from 'openai'
 import { writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
@@ -126,12 +126,12 @@ Respond in JSON format:
       .from('cover_letters')
       .insert({
         user_id: 'demo-user',
-        job_title: jobTitle,
+        position: jobTitle,
         company_name: companyName,
         job_description: jobDescription,
-        resume_content: resumeContent,
+        resume_data: resumeContent,
         tone: tone,
-        generated_content: generatedContent.cover_letter
+        content: generatedContent.cover_letter
       })
       .select()
       .single()

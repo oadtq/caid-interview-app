@@ -9,7 +9,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, Sparkles, FileText, Target, Users, TrendingUp, Clock, CheckCircle, Copy, Download } from 'lucide-react'
 
-export function GenerateCoverLetter() {
+interface GenerateCoverLetterProps {
+  setActiveTab?: (tab: string) => void
+}
+
+export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [jobTitle, setJobTitle] = useState("")
   const [companyName, setCompanyName] = useState("")
@@ -66,7 +70,7 @@ export function GenerateCoverLetter() {
       }
 
       const result = await response.json()
-      setGeneratedCoverLetter(result.coverLetter)
+      setGeneratedCoverLetter(result.cover_letter)
     } catch (error) {
       console.error('Error generating cover letter:', error)
       setError('Failed to generate cover letter. Please try again.')
@@ -87,6 +91,12 @@ export function GenerateCoverLetter() {
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
+  }
+
+  const handleViewAllCoverLetters = () => {
+    if (setActiveTab) {
+      setActiveTab('my-cover-letters')
+    }
   }
 
   const stats = [
@@ -147,6 +157,12 @@ export function GenerateCoverLetter() {
               Download as Text
             </Button>
             <Button 
+              onClick={handleViewAllCoverLetters}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              View All Cover Letters
+            </Button>
+            <Button 
               onClick={() => {
                 setGeneratedCoverLetter("")
                 setJobTitle("")
@@ -154,7 +170,7 @@ export function GenerateCoverLetter() {
                 setJobDescription("")
                 setSelectedFile(null)
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              variant="outline"
             >
               Generate Another
             </Button>

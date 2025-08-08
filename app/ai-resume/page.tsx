@@ -39,9 +39,9 @@ export default function AIResumePage() {
       case "templates":
         return <ResumeTemplates />
       case "generate-cover-letter":
-        return <GenerateCoverLetter />
+        return <GenerateCoverLetter setActiveTab={setActiveTab} />
       case "my-cover-letters":
-        return <MyCoverLetters />
+        return <MyCoverLetters setActiveTab={setActiveTab} />
       case "resume-builder":
         return <ResumeBuilder />
       default:
