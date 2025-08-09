@@ -31,9 +31,9 @@ export default function AIInterviewPage() {
   }, [activeTab])
 
   const userInfo = {
-    firstName: "Hoa",
-    lastName: "Nguyen",
-    email: "hoa.nguyen@vinuni.edu.vn",
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@vinuni.edu.vn",
     studentId: "VU2024001",
   }
 

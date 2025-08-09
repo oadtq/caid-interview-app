@@ -78,13 +78,40 @@ export default function Practice({ onTabChange }: PracticeProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v || !stream) return
+    try {
+      // Attach stream and ensure playback starts
+      if (v.srcObject !== stream) {
+        v.srcObject = stream
+      }
+      // Some browsers require an explicit play() call
+      const playPromise = v.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          v.muted = true
+          v.play().catch(() => {})
+        })
+      }
+    } catch (err) {
+      console.error('Failed to start video preview:', err)
+    }
+  }, [stream])
+
   const initializeCamera = async () => {
     try {
       // Always request both video and audio; we can toggle tracks after
       const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       setStream(mediaStream)
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream
+        const v = videoRef.current
+        v.srcObject = mediaStream
+        v.muted = true
+        // Attempt to start playback immediately
+        v.play().catch(() => {
+          // Ignore autoplay restrictions; the separate effect will retry
+        })
       }
     } catch (error) {
       console.error('Error accessing camera:', error)

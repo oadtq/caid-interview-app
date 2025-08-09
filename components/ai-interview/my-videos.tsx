@@ -370,9 +370,31 @@ export function MyVideos() {
     setSelectedVideo(null)
   }
 
-  const handleDelete = (videoId: string) => {
-    console.log('Delete video:', videoId)
-    // TODO: Implement deletion via API if desired
+  const handleDelete = async (videoId: string) => {
+    // Optimistic UI update
+    const previous = responses
+    setResponses(prev => prev.filter(r => r.id !== videoId))
+    try {
+      const res = await fetch(`/api/interview/responses/${videoId}`, {
+        method: 'DELETE'
+      })
+      if (!res.ok) {
+        throw new Error('Failed to delete')
+      }
+      // If we were viewing this item, close modals
+      if (selectedVideo === videoId) {
+        setShowFeedback(false)
+        setSelectedVideo(null)
+        setSelectedCriterion(null)
+      }
+      if (watchingVideo === videoId) {
+        setWatchingVideo(null)
+      }
+    } catch (e) {
+      console.error(e)
+      // Revert on failure
+      setResponses(previous)
+    }
   }
 
   const selectedVideoData = savedAnswers.find(answer => answer.id === selectedVideo)
