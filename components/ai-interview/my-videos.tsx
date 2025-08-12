@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Video, Clock, Star, Eye, BarChart3, X, CheckCircle, Trash2, Play, Volume2, Settings, Maximize, Search, AlertTriangle, Info, TrendingUp, MessageSquare, Zap, Timer, Gauge, Brain, Target, Mic, Users, Activity, Volume, Lightbulb, PlayCircle, Smile, Shield, FileText } from 'lucide-react'
+import { Video, ArrowRight, Clock, Star, Eye, BarChart3, X, CheckCircle, Trash2, Play, Volume2, Settings, Maximize, Search, AlertTriangle, Info, TrendingUp, MessageSquare, Zap, Timer, Gauge, Brain, Target, Mic, Users, Activity, Volume, Lightbulb, PlayCircle, Smile, Shield, FileText } from 'lucide-react'
 
 interface CriterionDetail {
   score: number
@@ -644,61 +644,36 @@ export function MyVideos() {
                 </div>
               ))}
             </div>
-            <div className="mt-4">
-              
-            </div>
           </div>
         )}
+
+        {/* Tips */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="h-4 w-4 text-blue-600" />
+            <span className="font-medium text-blue-800">Improvement Tips</span>
+          </div>
+          <div className="space-y-2 text-sm text-blue-700">
+            {criterion.tips?.map((tip, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <ArrowRight className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <span className="font-medium">{tip}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Overall Performance specific sections */}
         {criterionKey === 'overallPerformance' && (
           <>
-            {/* Good Job Section */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="font-medium text-green-800">Good Job!</span>
-                <Badge variant="secondary" className="text-xs">AI Generated</Badge>
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-800">Alignment with Role</span>
-              </div>
-              <div className="space-y-2 text-sm text-green-700">
-                <div>
-                  <span className="font-medium">Strengths:</span> {criterion.examples?.[0] || 'Positive aspects identified'}
-                </div>
-                <div>
-                  <span className="font-medium">Improvements:</span> {criterion.tips?.[0] || 'Consider refining clarity and structure'}
-                </div>
-              </div>
-            </div>
-
-            {/* Needs Work Section */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                <span className="font-medium text-red-800">Needs Work!</span>
-                <Badge variant="secondary" className="text-xs">AI Generated</Badge>
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-4 w-4 text-red-600" />
-                <span className="text-sm font-medium text-red-800">Clarity</span>
-              </div>
-              <div className="text-sm text-red-700 space-y-1">
-                <div><span className="font-medium">Strengths:</span> {criterion.examples?.[1] || 'Some positive aspects identified'}</div>
-                <div><span className="font-medium">Improvements:</span> {criterion.tips?.[1] || 'Focus on improving this area'}</div>
-              </div>
-            </div>
-
             {/* Optimized Answer Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-h-48 overflow-y-auto">
+            <div className="border rounded-lg p-4 max-h-48 overflow-y-auto">
               <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-blue-800">Optimized Answer</span>
+                <FileText className="h-4 w-4 " />
+                <span className="font-medium ">Transcript</span>
               </div>
-              <div className="text-sm text-blue-700 leading-relaxed whitespace-pre-wrap break-words hyphens-auto">
-                {(selectedVideoData?.detailedFeedback.overallPerformance?.detailedAnalysis && selectedVideoData?.transcription) ? selectedVideoData?.transcription : 'Practice structuring your answer with a clear beginning, middle, and end; quantify achievements; and maintain a confident, conversational tone.'}
+              <div className="text-sm leading-relaxed whitespace-pre-wrap break-words hyphens-auto">
+                {(selectedVideoData?.detailedFeedback.overallPerformance?.detailedAnalysis && selectedVideoData?.transcription) ? selectedVideoData?.transcription : 'No Data Found'}
               </div>
             </div>
           </>

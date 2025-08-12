@@ -11,6 +11,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// Helper function to extract JSON from markdown code blocks
+function extractJsonFromMarkdown(content: string): string {
+  // Remove markdown code block markers
+  let cleaned = content.trim()
+  
+  // Remove ```json and ``` markers
+  cleaned = cleaned.replace(/^```json\s*/i, '')
+  cleaned = cleaned.replace(/^```\s*/i, '')
+  cleaned = cleaned.replace(/\s*```$/i, '')
+  
+  return cleaned.trim()
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -93,9 +106,13 @@ Respond with JSON only.`
 
     let parsed: any = null
     try {
-      parsed = JSON.parse(completion.choices[0].message.content || '{}')
+      const aiResponse = completion.choices[0].message.content || '{}'
+      const cleanedJson = extractJsonFromMarkdown(aiResponse)
+      parsed = JSON.parse(cleanedJson)
+      console.log('Parsed JSON:', parsed)
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
+      console.error('Raw AI response:', completion.choices[0].message.content)
     }
 
     const detailedFallback = {
@@ -225,7 +242,7 @@ Respond with JSON only.`
       ]
     }
 
-    const detailed = parsed?.detailed || detailedFallback
+    const detailed = parsed?.detailed || parsed || detailedFallback
 
     // Derive duration/wpm if missing
     const totalWords = transcribedText.trim() ? transcribedText.trim().split(/\s+/).length : 0
@@ -243,6 +260,8 @@ Respond with JSON only.`
       detailed.paceOfSpeech.wpm = Math.round((totalWords || 180) / (mins || 1))
       detailed.paceOfSpeech.summary = `${detailed.paceOfSpeech.wpm} words per minute`
     }
+
+    console.log('Saving data:', detailed)
     
     // Persist detailed (for new UI)
     const { error: updateError } = await supabase
