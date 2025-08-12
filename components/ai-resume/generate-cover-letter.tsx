@@ -42,7 +42,15 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
 
   const handleGenerate = async () => {
     if (!jobTitle || !companyName) {
-      setError("Please fill in job title and company name")
+      setError("Please fill in job title, company name, job description, and upload your resume")
+      return
+    }
+    if (!jobDescription.trim()) {
+      setError("Please provide the job description")
+      return
+    }
+    if (!selectedFile) {
+      setError("Please upload your resume (PDF)")
       return
     }
 
@@ -162,7 +170,7 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
             >
               View All Cover Letters
             </Button>
-            <Button 
+            {/* <Button 
               onClick={() => {
                 setGeneratedCoverLetter("")
                 setJobTitle("")
@@ -173,7 +181,7 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
               variant="outline"
             >
               Generate Another
-            </Button>
+            </Button> */}
           </div>
         </motion.div>
       </div>
@@ -248,7 +256,7 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
             {/* Job Description */}
             <div>
               <Label htmlFor="jobDescription" className="text-sm font-medium text-gray-700 mb-2 block">
-                Job Description (Optional)
+                Job Description <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="jobDescription"
@@ -256,15 +264,16 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="w-full min-h-[120px] resize-none"
+                required
               />
             </div>
 
             {/* Upload Resume */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Upload Resume (Optional)
+                Upload Resume <span className="text-red-500">*</span>
               </Label>
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-blue-300 transition-colors">
+              <div className={`border-2 border-dashed ${!selectedFile && error?.toLowerCase().includes("resume") ? "border-red-400" : "border-gray-200"} rounded-lg p-8 text-center hover:border-blue-300 transition-colors`}>
                 <div className="flex flex-col items-center">
                   <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
                     <Upload className="h-6 w-6 text-blue-600" />
@@ -276,6 +285,7 @@ export function GenerateCoverLetter({ setActiveTab }: GenerateCoverLetterProps) 
                       accept=".pdf"
                       onChange={handleFileSelect}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      required
                     />
                     <Button variant="outline" className="bg-white">
                       Choose File

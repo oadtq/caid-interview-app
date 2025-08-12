@@ -112,7 +112,7 @@ Respond with JSON only.`
       const aiResponse = completion.choices[0].message.content || '{}'
       const cleanedJson = extractJsonFromMarkdown(aiResponse)
       parsed = JSON.parse(cleanedJson)
-      console.log('Parsed JSON:', parsed)
+      // console.log('Parsed JSON:', parsed)
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
       console.error('Raw AI response:', completion.choices[0].message.content)

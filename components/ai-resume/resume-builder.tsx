@@ -248,8 +248,8 @@ export function ResumeBuilder() {
     const validEducation = education.filter(edu => 
       edu.school.trim() && 
       edu.schoolLocation.trim() && 
-      edu.degreeProgram.trim() && 
-      edu.graduationYear.trim()
+      edu.degreeProgram.trim() &&
+      edu.fieldOfStudy.trim()
     )
     
     if (validEducation.length === 0) {
@@ -529,7 +529,7 @@ export function ResumeBuilder() {
             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Code className="h-5 w-5 text-blue-600" />
-                Skills
+                Skills <span className="text-red-500">*</span>
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <p className="text-gray-700">
@@ -860,7 +860,7 @@ export function ResumeBuilder() {
                       />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-gray-700 mb-2 block">Field of Study</Label>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">Field of Study <span className="text-red-500">*</span></Label>
                       <Input 
                         placeholder="e.g., Computer Science" 
                         value={edu.fieldOfStudy}
@@ -988,9 +988,11 @@ export function ResumeBuilder() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <Code className="h-5 w-5 text-blue-600" />
-                Skills
+                Skills <span className="text-red-500">*</span>
               </h2>
             </div>
+
+            <p className="text-sm text-gray-600 mb-4">At least one skill is required. Add your technical and soft skills below.</p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left side - Skills List */}

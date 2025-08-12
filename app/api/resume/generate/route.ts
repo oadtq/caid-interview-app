@@ -11,6 +11,20 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// Function to clean AI response and extract JSON
+function extractJsonFromResponse(content: string): string {
+  // Remove markdown code blocks
+  let cleaned = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '')
+  
+  // If the content starts with { and ends with }, it's likely valid JSON
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
+  if (jsonMatch) {
+    return jsonMatch[0]
+  }
+  
+  return cleaned
+}
+
 export async function POST(request: NextRequest) {
   try {
     const resumeData = await request.json()
@@ -144,7 +158,7 @@ Respond in JSON format:
       messages: [
         {
           role: 'system',
-          content: 'You are an expert resume writer specializing in ATS optimization and quantified achievements. Always respond with valid JSON.'
+          content: 'You are an expert resume writer specializing in ATS optimization and quantified achievements. IMPORTANT: Always respond with valid JSON only. Do not include markdown formatting, code blocks, or any other text. Return only the JSON object.'
         },
         {
           role: 'user',
@@ -157,9 +171,13 @@ Respond in JSON format:
 
     let generatedContent
     try {
-      generatedContent = JSON.parse(completion.choices[0].message.content || '{}')
+      const rawContent = completion.choices[0].message.content || '{}'
+      const cleanedContent = extractJsonFromResponse(rawContent)
+      generatedContent = JSON.parse(cleanedContent)
+      console.log('Generated content:', generatedContent)
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
+      console.error('Raw content:', completion.choices[0].message.content)
       return NextResponse.json(
         { error: 'Failed to generate resume content' },
         { status: 500 }

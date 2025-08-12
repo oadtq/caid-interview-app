@@ -221,13 +221,13 @@ export function MyCoverLetters({ setActiveTab }: MyCoverLettersProps) {
                     </select>
                   </div>
                 </div>
-                <Button 
+                {/* <Button 
                   onClick={handleNavigateToGenerate}
                   className="bg-[#114ef7] hover:bg-[#0f46d1] text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   New Cover Letter
-                </Button>
+                </Button> */}
               </div>
             </div>
           </Card3D>
@@ -357,14 +357,14 @@ export function MyCoverLetters({ setActiveTab }: MyCoverLettersProps) {
           <Card3D>
             <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm text-center">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Ready to create your next cover letter?</h3>
-              <p className="text-gray-600 mb-6">Generate personalized cover letters tailored to your target role and company</p>
-              <Button 
+              {/* <p className="text-gray-600 mb-6">Generate personalized cover letters tailored to your target role and company</p> */}
+              {/* <Button 
                 onClick={handleNavigateToGenerate}
                 className="bg-[#114ef7] hover:bg-[#0f46d1] text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create New Cover Letter
-              </Button>
+              </Button> */}
             </div>
           </Card3D>
         </motion.div>
