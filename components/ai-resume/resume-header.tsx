@@ -79,6 +79,11 @@ export function ResumeHeader({ activeTab, onTabChange, onLogout, userInfo }: Res
         setShowCoverLettersDropdown(!showCoverLettersDropdown)
         setShowScanDropdown(false)
       }
+    } else if (tab.id === "templates") {
+      // Open Resume Template in a new window
+      window.open(window.location.origin + "/ai-resume?tab=templates", "_blank")
+      setShowScanDropdown(false)
+      setShowCoverLettersDropdown(false)
     } else {
       onTabChange(tab.id)
       setShowScanDropdown(false)

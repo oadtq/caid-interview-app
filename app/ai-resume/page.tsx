@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { ResumeHeader } from "@/components/ai-resume/resume-header"
 import { ResumeHome } from "@/components/ai-resume/resume-home"
 import { ResumeAI } from "@/components/ai-resume/resume-ai"
@@ -14,6 +15,15 @@ import { motion, AnimatePresence } from "framer-motion"
 
 export default function AIResumePage() {
   const [activeTab, setActiveTab] = useState("home")
+  const searchParams = useSearchParams()
+
+  // Read URL parameters and set initial tab
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')
+    if (tabParam) {
+      setActiveTab(tabParam)
+    }
+  }, [searchParams])
 
   const userInfo = {
     firstName: "John",
