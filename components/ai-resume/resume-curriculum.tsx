@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Play, ChevronDown, ChevronRight, Volume2, Settings, Maximize, FileText, CheckCircle, HelpCircle, Eye } from 'lucide-react'
+import { BookOpen, Play, ChevronDown, ChevronRight, Volume2, Settings, Maximize, FileText, CheckCircle, HelpCircle, Eye, Brain } from 'lucide-react'
 import { useState } from "react"
+import curriculumData from "./resume-curriculum.json"
 
 export function ResumeCurriculum() {
   const [currentLesson, setCurrentLesson] = useState(0)
@@ -11,70 +12,29 @@ export function ResumeCurriculum() {
   const [activeTab, setActiveTab] = useState("transcript")
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({})
+  const [showQuizResults, setShowQuizResults] = useState(false)
 
-  const lessons = [
-    {
-      id: 1,
-      title: "Resume Essentials: Mastering Structure That Stands Out",
-      duration: "08:42",
-      completed: false,
-      current: true,
-      videoId: "Tt08KmFfIYQ",
-    },
-    {
-      id: 2,
-      title: "Advanced Formatting: Design Your Resume Like a Pro",
-      duration: "09:15",
-      completed: false,
-      videoId: "R3abknwWX7k",
-    },
-    {
-      id: 3,
-      title: "Crafting a Resume That Speaks to Recruiters",
-      duration: "11:30",
-      completed: false,
-      videoId: "rvKNhhhzkP8",
-    },
-    {
-      id: 4,
-      title: "How to Tailor Your Resume for AI Screening Systems",
-      duration: "10:45",
-      completed: false,
-      videoId: "ck5nw7R1uEs",
-    },
-    {
-      id: 5,
-      title: "Writing Powerful Summaries that Get Noticed",
-      duration: "07:20",
-      completed: false,
-      videoId: "Tt08KmFfIYQ", // Reusing first video for demo
-    },
-    {
-      id: 6,
-      title: "Real Examples: From Mediocre to Memorable Resumes",
-      duration: "12:18",
-      completed: false,
-      videoId: "R3abknwWX7k", // Reusing second video for demo
-    },
-    {
-      id: 7,
-      title: "Using Keywords to Pass Resume Scanners",
-      duration: "09:55",
-      completed: false,
-      videoId: "rvKNhhhzkP8", // Reusing third video for demo
-    },
-    {
-      id: 8,
-      title: "Final Review: Optimizing Your Resume Before You Hit Send",
-      duration: "08:30",
-      completed: false,
-      videoId: "ck5nw7R1uEs", // Reusing fourth video for demo
-    },
-  ]
+  // Extract video ID from YouTube URL
+  const extractVideoId = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+    return match ? match[1] : ""
+  }
+
+  // Transform JSON data to lessons format
+  const lessons = curriculumData.map((item, index) => ({
+    id: index + 1,
+    title: item.Title,
+    duration: "10:00", // Default duration since not provided in JSON
+    completed: false,
+    current: index === 0,
+    videoId: extractVideoId(item.Link),
+    mcqs: item.MCQs
+  }))
 
   const transcriptContent: Record<number, { title: string; content: string[] }> = {
     0: {
-      title: "Resume Essentials: Mastering Structure That Stands Out",
+      title: lessons[0]?.title || "Resume Essentials: Mastering Structure That Stands Out",
       content: [
         "Welcome to EveryMatch's Resume Curriculum! I'm excited to help you create a resume that not only gets noticed but gets you hired.",
         "Today we're starting with the fundamentals - the structure that makes your resume stand out from the hundreds that recruiters see every day.",
@@ -87,34 +47,35 @@ export function ResumeCurriculum() {
     },
   }
 
-  const homeworkContent: Record<number, { title: string; assignments: { task: string; description: string; timeEstimate: string }[] }> = {
-    0: {
-      title: "Resume Essentials: Mastering Structure That Stands Out",
-      assignments: [
-        {
-          task: "Resume Structure Audit",
-          description:
-            "Review your current resume and identify which sections you have and which are missing. Create a checklist of the 6 essential sections we discussed.",
-          timeEstimate: "15 minutes",
-        },
-        {
-          task: "Information Inventory",
-          description:
-            "Gather all your professional information and organize it by section. Don't worry about formatting yet - just collect everything you might include.",
-          timeEstimate: "30 minutes",
-        },
-        {
-          task: "Story Mapping Exercise",
-          description:
-            "Write a 2-3 sentence story about your career progression. This will help you understand how to connect your sections cohesively.",
-          timeEstimate: "20 minutes",
-        },
-      ],
-    },
-  }
-
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying)
+  }
+
+  const handleQuizAnswer = (questionIndex: number, answer: string) => {
+    setQuizAnswers(prev => ({
+      ...prev,
+      [questionIndex]: answer
+    }))
+  }
+
+  const calculateQuizScore = () => {
+    const currentMCQs = lessons[currentLesson]?.mcqs || []
+    let correct = 0
+    currentMCQs.forEach((mcq, index) => {
+      if (quizAnswers[index] === mcq.Answer) {
+        correct++
+      }
+    })
+    return { correct, total: currentMCQs.length, percentage: Math.round((correct / currentMCQs.length) * 100) }
+  }
+
+  const handleSubmitQuiz = () => {
+    setShowQuizResults(true)
+  }
+
+  const handleRetakeQuiz = () => {
+    setQuizAnswers({})
+    setShowQuizResults(false)
   }
 
   return (
@@ -128,7 +89,7 @@ export function ResumeCurriculum() {
               <iframe
                 width="100%"
                 height="100%"
-                src={`https://www.youtube.com/embed/${lessons[currentLesson].videoId}?si=Ch5rder7lUFsSc0I`}
+                src={`https://www.youtube.com/embed/${lessons[currentLesson]?.videoId}?si=Ch5rder7lUFsSc0I`}
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -141,13 +102,13 @@ export function ResumeCurriculum() {
 
           {/* Lesson Info */}
           <div className="mb-6">
-            <h1 className="text-gray-900 mb-3 text-xl font-normal">{lessons[currentLesson].title}</h1>
+            <h1 className="text-gray-900 mb-3 text-xl font-normal">{lessons[currentLesson]?.title}</h1>
             <div className="flex items-center gap-4 text-gray-600">
               <span className="text-sm">
                 Lesson by: <span className="font-medium text-blue-600">EveryMatch Team</span>
               </span>
               <span>•</span>
-              <span className="text-sm">{lessons[currentLesson].duration}</span>
+              <span className="text-sm">{lessons[currentLesson]?.duration}</span>
               <span>•</span>
               <span className="text-sm">
                 Lesson {currentLesson + 1} of {lessons.length}
@@ -172,16 +133,16 @@ export function ResumeCurriculum() {
                 </div>
               </button>
               <button
-                onClick={() => setActiveTab("homework")}
+                onClick={() => setActiveTab("quiz")}
                 className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "homework"
+                  activeTab === "quiz"
                     ? "border-blue-500 text-blue-600"
                     : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Homework
+                  <Brain className="w-4 h-4" />
+                  Quiz
                 </div>
               </button>
             </div>
@@ -205,57 +166,128 @@ export function ResumeCurriculum() {
               </div>
             )}
 
-            {activeTab === "homework" && (
+            {activeTab === "quiz" && (
               <div className="space-y-6">
                 <div className="border-b border-gray-100 pb-4 mb-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Practice Assignments</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Knowledge Check</h3>
                   <p className="text-gray-600">
-                    Complete these exercises to reinforce your learning and apply the concepts.
+                    Test your understanding of the lesson with these multiple choice questions.
                   </p>
                 </div>
 
-                <div className="space-y-6">
-                  {homeworkContent[currentLesson]?.assignments.map((assignment: any, index: number) => (
-                    <div
-                      key={index}
-                      className="border border-gray-200 rounded-lg p-6 hover:border-blue-200 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="text-lg font-semibold text-gray-900">{assignment.task}</h4>
-                        <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                          {assignment.timeEstimate}
-                        </span>
+                {!showQuizResults ? (
+                  <div className="space-y-8">
+                    {lessons[currentLesson]?.mcqs?.map((mcq, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-6 hover:border-blue-200 transition-colors"
+                      >
+                        <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                          Question {index + 1}: {mcq.Question}
+                        </h4>
+                        <div className="space-y-3">
+                          {mcq.Options.map((option, optionIndex) => (
+                            <label
+                              key={optionIndex}
+                              className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${index}`}
+                                value={option.charAt(0)}
+                                checked={quizAnswers[index] === option.charAt(0)}
+                                onChange={() => handleQuizAnswer(index, option.charAt(0))}
+                                className="mr-3 text-blue-600 focus:ring-blue-500"
+                              />
+                              <span className="text-gray-700">{option}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                      <p className="text-gray-700 leading-relaxed mb-4">{assignment.description}</p>
-                      <div className="flex gap-3">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
-                        >
-                          <HelpCircle className="w-4 h-4 mr-2" />
-                          View Questions
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Answers
-                        </Button>
-                      </div>
+                    ))}
+
+                    <div className="flex justify-center pt-6">
+                      <Button 
+                        onClick={handleSubmitQuiz}
+                        disabled={Object.keys(quizAnswers).length < (lessons[currentLesson]?.mcqs?.length || 0)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+                      >
+                        Submit Quiz
+                      </Button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-6 text-center">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-2">Quiz Results</h3>
+                      <div className="text-4xl font-bold text-blue-600 mb-2">
+                        {calculateQuizScore().percentage}%
+                      </div>
+                      <p className="text-blue-800">
+                        You got {calculateQuizScore().correct} out of {calculateQuizScore().total} questions correct!
+                      </p>
+                    </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-                  <h4 className="font-semibold text-blue-900 mb-2">💡 Pro Tip</h4>
-                  <p className="text-blue-800">
-                    Don't rush through these exercises. The time you invest in properly structuring your resume
-                    foundation will save you hours of revision later and significantly improve your interview callback
-                    rate.
-                  </p>
-                </div>
+                    <div className="space-y-6">
+                      {lessons[currentLesson]?.mcqs?.map((mcq, index) => (
+                        <div
+                          key={index}
+                          className={`border rounded-lg p-6 ${
+                            quizAnswers[index] === mcq.Answer
+                              ? "border-green-200 bg-green-50"
+                              : "border-red-200 bg-red-50"
+                          }`}
+                        >
+                          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                            Question {index + 1}: {mcq.Question}
+                          </h4>
+                          <div className="space-y-2">
+                            {mcq.Options.map((option, optionIndex) => (
+                              <div
+                                key={optionIndex}
+                                className={`p-3 rounded-lg ${
+                                  option.charAt(0) === mcq.Answer
+                                    ? "bg-green-100 border border-green-300"
+                                    : option.charAt(0) === quizAnswers[index] && option.charAt(0) !== mcq.Answer
+                                    ? "bg-red-100 border border-red-300"
+                                    : "bg-gray-50 border border-gray-200"
+                                }`}
+                              >
+                                <span className={`font-medium ${
+                                  option.charAt(0) === mcq.Answer
+                                    ? "text-green-700"
+                                    : option.charAt(0) === quizAnswers[index] && option.charAt(0) !== mcq.Answer
+                                    ? "text-red-700"
+                                    : "text-gray-700"
+                                }`}>
+                                  {option}
+                                  {option.charAt(0) === mcq.Answer && " ✓"}
+                                  {option.charAt(0) === quizAnswers[index] && option.charAt(0) !== mcq.Answer && " ✗"}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-center gap-4 pt-6">
+                      <Button 
+                        onClick={handleRetakeQuiz}
+                        variant="outline"
+                        className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                      >
+                        Retake Quiz
+                      </Button>
+                      <Button 
+                        onClick={() => setActiveTab("transcript")}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Review Lesson
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -272,7 +304,7 @@ export function ResumeCurriculum() {
 
               <div className="mb-4">
                 <h2 className="text-xl font-bold text-gray-900 mb-1">Resume Mastery</h2>
-                <div className="text-right text-sm text-gray-500">0 / 8</div>
+                <div className="text-right text-sm text-gray-500">0 / {lessons.length}</div>
               </div>
 
               {/* Course Section */}
@@ -289,7 +321,7 @@ export function ResumeCurriculum() {
                     )}
                     <span className="font-medium text-gray-900">1. Resume Curriculum</span>
                   </div>
-                  <span className="text-sm text-gray-500">0/8</span>
+                  <span className="text-sm text-gray-500">0/{lessons.length}</span>
                 </button>
 
                 {isExpanded && (
@@ -353,7 +385,7 @@ export function ResumeCurriculum() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-blue-800">
                   <span>Completed:</span>
-                  <span>0 / 8 lessons</span>
+                  <span>0 / {lessons.length} lessons</span>
                 </div>
                 <div className="flex justify-between text-blue-800">
                   <span>Time invested:</span>

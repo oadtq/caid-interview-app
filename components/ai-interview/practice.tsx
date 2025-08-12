@@ -47,6 +47,8 @@ export function Practice({ onTabChange }: PracticeProps) {
   const [hasStartedRecording, setHasStartedRecording] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const [recordingTime, setRecordingTime] = useState(0)
+  const [timeLimit] = useState(60) // 1 minute time limit
+  const [timeRemaining, setTimeRemaining] = useState(timeLimit)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const [audioRecorder, setAudioRecorder] = useState<MediaRecorder | null>(null)
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([])
@@ -56,6 +58,8 @@ export function Practice({ onTabChange }: PracticeProps) {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const videoChunksRef = useRef<Blob[]>([])
+  const audioChunksRef = useRef<Blob[]>([])
 
   // Load question data
   useEffect(() => {
@@ -307,6 +311,10 @@ export function Practice({ onTabChange }: PracticeProps) {
   const startRecording = () => {
     if (!stream) return
 
+    // Reset chunk refs
+    videoChunksRef.current = []
+    audioChunksRef.current = []
+
     // Create cloned tracks for recording to avoid interfering with preview
     const videoTrack = stream.getVideoTracks()[0]
     const audioTrack = stream.getAudioTracks()[0]
@@ -328,17 +336,22 @@ export function Practice({ onTabChange }: PracticeProps) {
     const mimeType = preferredTypes.find(t => !t || MediaRecorder.isTypeSupported(t)) || 'video/webm'
     const options = mimeType ? { mimeType } as MediaRecorderOptions : undefined
     const recorder = new MediaRecorder(recordingStream, options)
-    const chunks: Blob[] = []
+    
     recorder.ondataavailable = (ev) => {
-      if (ev.data.size > 0) chunks.push(ev.data)
+      console.log('Video ondataavailable, data size:', ev.data.size)
+      if (ev.data.size > 0) {
+        videoChunksRef.current.push(ev.data)
+        console.log('Video chunks now:', videoChunksRef.current.length)
+      }
     }
     recorder.onstop = () => {
-      setRecordedChunks(chunks)
+      console.log('Video recorder onstop, chunks length:', videoChunksRef.current.length)
+      setRecordedChunks([...videoChunksRef.current])
       // Clean up cloned tracks
       clonedVideoTrack.stop()
       clonedAudioTrack.stop()
     }
-    recorder.start()
+    recorder.start(1000) // Request data every 1 second
     setMediaRecorder(recorder)
 
     // Start parallel audio-only recorder
@@ -346,30 +359,73 @@ export function Practice({ onTabChange }: PracticeProps) {
     const audioMime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', ''].find(t => !t || MediaRecorder.isTypeSupported(t)) || 'audio/webm'
     const audioOptions = audioMime ? { mimeType: audioMime } as MediaRecorderOptions : undefined
     const aRecorder = new MediaRecorder(audioStream, audioOptions)
-    const aChunks: Blob[] = []
+    
     aRecorder.ondataavailable = (ev) => {
-      if (ev.data.size > 0) aChunks.push(ev.data)
+      if (ev.data.size > 0) {
+        audioChunksRef.current.push(ev.data)
+      }
     }
     aRecorder.onstop = () => {
-      setAudioChunks(aChunks)
+      setAudioChunks([...audioChunksRef.current])
       // Clean up audio stream
       audioStream.getTracks().forEach(track => track.stop())
     }
-    aRecorder.start()
+    aRecorder.start(1000) // Request data every 1 second
     setAudioRecorder(aRecorder)
 
     setIsRecording(true)
     setRecordingTime(0)
-    timerRef.current = setInterval(() => setRecordingTime(prev => prev + 1), 1000)
+    setTimeRemaining(timeLimit)
+    
+    // Timer for recording time and countdown
+    timerRef.current = setInterval(() => {
+      setRecordingTime(prev => {
+        const newTime = prev + 1
+        const remaining = timeLimit - newTime
+        
+        // Update time remaining
+        setTimeRemaining(remaining)
+        
+        // Auto-stop when time limit is reached
+        if (remaining <= 0) {
+          stopRecording()
+        }
+        
+        return newTime
+      })
+    }, 1000)
   }
 
   const stopRecording = () => {
+    console.log('stopRecording called, isRecording:', isRecording, 'mediaRecorder:', mediaRecorder)
+    console.log('Current video chunks in ref:', videoChunksRef.current.length)
+    
     if (mediaRecorder && isRecording) {
+      // Request any remaining data before stopping
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.requestData()
+      }
       mediaRecorder.stop()
+      console.log('mediaRecorder.stop() called')
     }
     if (audioRecorder && isRecording) {
+      // Request any remaining data before stopping
+      if (audioRecorder.state === 'recording') {
+        audioRecorder.requestData()
+      }
       audioRecorder.stop()
+      console.log('audioRecorder.stop() called')
     }
+    
+    // Immediately set the chunks from refs so Submit button appears right away
+    if (videoChunksRef.current.length > 0) {
+      setRecordedChunks([...videoChunksRef.current])
+      console.log('Immediately set recordedChunks to:', videoChunksRef.current.length)
+    }
+    if (audioChunksRef.current.length > 0) {
+      setAudioChunks([...audioChunksRef.current])
+    }
+    
     setIsRecording(false)
     if (timerRef.current) clearInterval(timerRef.current)
   }
@@ -425,7 +481,10 @@ export function Practice({ onTabChange }: PracticeProps) {
   const resetRecording = () => {
     setRecordedChunks([])
     setAudioChunks([])
+    videoChunksRef.current = []
+    audioChunksRef.current = []
     setRecordingTime(0)
+    setTimeRemaining(timeLimit)
     setUploadStatus('idle')
     setHasStartedRecording(false)
     setCountdown(0)
@@ -602,6 +661,12 @@ export function Practice({ onTabChange }: PracticeProps) {
           <div className="mb-4">
             <span className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of {sessionQuestions.length}</span>
           </div>
+          <div className="mb-4">
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+              <Clock className="h-3 w-3 mr-1" />
+              1 minute time limit
+            </Badge>
+          </div>
           <div className="flex justify-center gap-2 mb-8">
             {sessionQuestions.map((_, idx) => (
               <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentQuestionIndex ? 'bg-blue-600' : idx < currentQuestionIndex ? 'bg-blue-300' : 'bg-gray-300'}`} />
@@ -671,6 +736,20 @@ export function Practice({ onTabChange }: PracticeProps) {
                           <div className="w-1 h-2 bg-gray-400 rounded-full"></div>
                           <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Time Remaining Countdown */}
+                    {isRecording && timeRemaining <= 10 && (
+                      <div className="absolute top-4 right-4 bg-red-600 text-white rounded-lg px-3 py-2 font-bold text-lg">
+                        {timeRemaining}s
+                      </div>
+                    )}
+
+                    {/* Recording Time Display */}
+                    {isRecording && timeRemaining > 10 && (
+                      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white rounded-lg px-3 py-2 font-medium">
+                        {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
                       </div>
                     )}
 
@@ -749,20 +828,17 @@ export function Practice({ onTabChange }: PracticeProps) {
           <div className="flex gap-3">
             <Button 
               onClick={() => {
-                // skip question without recording
-                if (currentQuestionIndex < sessionQuestions.length - 1) {
-                  setCurrentQuestionIndex(currentQuestionIndex + 1)
+                // navigate to previous question
+                if (currentQuestionIndex > 0) {
+                  setCurrentQuestionIndex(currentQuestionIndex - 1)
                   resetRecording()
-                } else {
-                  if (onTabChange) onTabChange('videos')
-                  else window.location.href = '/ai-interview?tab=videos'
                 }
               }}
               variant="outline"
-              disabled={uploadStatus === 'uploading' || uploadStatus === 'analyzing' || isUploading}
+              disabled={uploadStatus === 'uploading' || uploadStatus === 'analyzing' || isUploading || currentQuestionIndex === 0}
               className="px-6 py-2 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Skip This Question
+              Previous Question
             </Button>
             <Button 
               onClick={() => {

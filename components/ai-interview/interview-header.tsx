@@ -51,7 +51,7 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
   ]
 
   const handleBackToDashboard = () => {
-    window.location.href = "/"
+    window.location.href = "/dashboard"
   }
 
   const handleTabClick = (tab: any) => {

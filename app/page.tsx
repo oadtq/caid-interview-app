@@ -1,9 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LoginForm } from "@/components/auth/login-form"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { FeatureSelectionDashboard } from "@/components/dashboard/feature-selection-dashboard"
 
 interface User {
   firstName: string
@@ -39,18 +37,11 @@ export default function StudentPortal() {
     setIsAuthenticated(true)
   }
 
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = "/dashboard"
+    }
+  }, [isAuthenticated])
 
-  if (!isAuthenticated) {
-    return <LoginForm onLogin={handleLogin} />
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader onLogout={handleLogout} userInfo={user} />
-      <FeatureSelectionDashboard />
-    </div>
-  )
+  return <LoginForm onLogin={handleLogin} />
 }

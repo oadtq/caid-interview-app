@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Globe, Building2, Target, GraduationCap, ChevronDown, ChevronUp, Users, BookOpen, Heart, Zap } from 'lucide-react'
+import { Globe, Building2, Target, GraduationCap, ChevronDown, ChevronUp, Users, BookOpen, Heart, Zap, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
 
@@ -22,6 +22,9 @@ export function QuestionSets() {
   const [expandedSubCategories, setExpandedSubCategories] = useState<Set<string>>(new Set())
   const [questionData, setQuestionData] = useState<QuestionSetData>({})
   const [loading, setLoading] = useState(true)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewCategory, setPreviewCategory] = useState<string>("")
+  const [previewSubCategory, setPreviewSubCategory] = useState<string>("")
 
   useEffect(() => {
     const loadQuestionData = async () => {
@@ -60,6 +63,12 @@ export function QuestionSets() {
 
   const isSubCategoryExpanded = (categoryKey: string, subCategory: string) => {
     return expandedSubCategories.has(`${categoryKey}-${subCategory}`)
+  }
+
+  const handlePreview = (category: string, subCategory: string) => {
+    setPreviewCategory(category)
+    setPreviewSubCategory(subCategory)
+    setShowPreview(true)
   }
 
   const getIconForCategory = (category: string) => {
@@ -327,13 +336,23 @@ export function QuestionSets() {
                             </div>
                           )}
                           
-                          <Button
-                            size="sm"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                            onClick={() => router.push(`/ai-interview?tab=practice&category=${set.category}`)}
-                          >
-                            Practice
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                              onClick={() => handlePreview(set.category, subCategory)}
+                            >
+                              Preview
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                              onClick={() => router.push(`/ai-interview?tab=practice&category=${set.category}`)}
+                            >
+                              Practice
+                            </Button>
+                          </div>
                         </div>
                       )
                     })}
@@ -344,6 +363,99 @@ export function QuestionSets() {
           )
         })}
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Question Preview</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPreview(false)}
+                  className="bg-transparent"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Category and Subcategory Info */}
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{previewCategory}</h3>
+                <p className="text-gray-600">{previewSubCategory}</p>
+              </div>
+
+              {/* Questions List */}
+              <div className="space-y-4">
+                {(() => {
+                  const categoryData = questionData[previewCategory]
+                  if (!categoryData) return <p className="text-gray-500">No questions available</p>
+                  
+                  const subCategoryData = categoryData[previewSubCategory]
+                  if (!subCategoryData) return <p className="text-gray-500">No questions available</p>
+                  
+                  let questions: string[] = []
+                  
+                  if (Array.isArray(subCategoryData)) {
+                    questions = subCategoryData
+                  } else {
+                    // Handle nested structure
+                    Object.values(subCategoryData).forEach(subSubCat => {
+                      if (Array.isArray(subSubCat)) {
+                        questions.push(...subSubCat)
+                      } else {
+                        Object.values(subSubCat).forEach(questionsList => {
+                          if (Array.isArray(questionsList)) {
+                            questions.push(...questionsList)
+                          }
+                        })
+                      }
+                    })
+                  }
+                  
+                  return questions.length > 0 ? (
+                    <div className="space-y-3">
+                      {questions.map((question, index) => (
+                        <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                              {index + 1}
+                            </div>
+                            <p className="text-gray-900 leading-relaxed">{question}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No questions available in this category</p>
+                  )
+                })()}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPreview(false)}
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowPreview(false)
+                    router.push(`/ai-interview?tab=practice&category=${previewCategory}`)
+                  }}
+                >
+                  Start Practice
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

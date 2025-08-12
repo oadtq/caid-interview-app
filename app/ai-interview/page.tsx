@@ -45,7 +45,7 @@ export default function AIInterviewPage() {
   const renderContent = () => {
     switch (activeTab) {
       case "home":
-        return <InterviewHome />
+        return <InterviewHome onTabChange={setActiveTab} />
       case "curriculum":
         return <InterviewCurriculum />
       case "question-sets":
@@ -57,7 +57,7 @@ export default function AIInterviewPage() {
       case "videos":
         return <MyVideos />
       default:
-        return <InterviewHome />
+        return <InterviewHome onTabChange={setActiveTab} />
     }
   }
 

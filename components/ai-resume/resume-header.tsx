@@ -67,7 +67,7 @@ export function ResumeHeader({ activeTab, onTabChange, onLogout, userInfo }: Res
   ]
 
   const handleBackToDashboard = () => {
-    window.location.href = "/"
+    window.location.href = "/dashboard"
   }
 
   const handleTabClick = (tab: any) => {
