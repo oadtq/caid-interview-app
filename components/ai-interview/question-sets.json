@@ -2109,7 +2109,7 @@
     },
     "Admission Interview": {
         "College of Business and Management": {
-            "Business School": {
+            "Master of Business Administration (MBA)": {
                 "Motivations and Goals": [
                     "Why are you pursuing an MBA at this time in your career?",
                     "What are your career goals immediately after graduation? What about in 5-10 years?",
@@ -2153,7 +2153,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Law School": {
+            "Master of Science in Organizational Leadership": {
                 "Motivations and Goals": [  
                     "Why do you want to become a lawyer?",
                     "What areas of law are you interested in, and why?",
@@ -2197,7 +2197,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Public Policy School": {
+            "Master of Science in Management": {
                 "Motivations and Goals": [
                     "Why are you interested in pursuing a degree in public policy?",
                     "What is a specific policy issue that you are passionate about, and why?",
@@ -2241,7 +2241,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Social Work": {
+            "Master of Science in Human Resource Management": {
                 "Motivations and Goals": [
                     "Why are you interested in becoming a social worker?",
                     "What specific population do you hope to work with, and why?",
@@ -2287,7 +2287,7 @@
             }
         },
         "College of Arts and Sciences": {
-            "Economics": {
+            "Master of Science in Economics": {
                 "Motivations and Goals": [
                     "Why are you interested in pursuing a degree in economics?",
                     "How do you believe an economics degree will help you achieve your career goals?",
@@ -2331,7 +2331,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Psychology": {
+            "Master of Science in Psychology": {
                 "Motivations and Goals": [
                     "Why are you interested in studying psychology?",
                     "How do you see this degree impacting your long-term career goals?",
@@ -2375,7 +2375,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Multimedia Communication": {
+            "Master of Arts in Media Studies": {
                 "Motivations and Goals": [
                     "Why are you interested in studying multimedia communication?",
                     "How do you see this degree impacting your long-term career goals?",
@@ -2421,7 +2421,7 @@
             }
         },
         "College of Engineering and Computer Science": {
-            "Computer Science": {
+            "Master of Science in Computer Science": {
                 "Motivations and Goals": [      
                     "Why do you want to study Computer Science?",
                     "What specific area of Computer Science, such as AI, cybersecurity, or software engineering, interests you most?",
@@ -2465,7 +2465,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Data Science": {
+            "Master of Science in Data Science": {
                 "Motivation & Goals": [
                     "Why are you interested in pursuing a degree in Data Science?",
                     "What is a real-world problem you believe could be solved with data science?",
@@ -2509,7 +2509,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Electrical and Computer Engineering": {
+            "Master of Science in Electrical and Computer Engineering": {
                 "Motivations and Goals": [
                     "Why are you interested in pursuing a degree in ECE?",
                     "What is a specific technology or device that sparked your interest in this field?",
@@ -2553,7 +2553,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Mechanical Engineering": {
+            "Master of Science in Mechanical Engineering": {
                 "Motivations and Goals": [
                     "Why are you interested in pursuing a degree in Mechanical Engineering?",
                     "What is a specific machine or device that sparked your interest in this field?",
@@ -2599,7 +2599,7 @@
             }
         },
         "College of Health Sciences": {
-            "Medical School": {
+            "Doctor of Medicine (M.D)": {
                 "Motivations and Goals": [
                     "What is your primary motivation for becoming a physician?",
                     "Describe an experience in a clinical setting that solidified your desire to pursue medicine.",
@@ -2643,7 +2643,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Dental School": {
+            "Master of Science in Dentistry": {
                 "Motivations and Goals": [
                     "Why do you want to become a dentist?",
                     "Describe an experience in a dental clinic that solidified your desire to pursue dentistry.",
@@ -2687,7 +2687,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Nursing School": {
+            "Master of Science in Nursing": {
                 "Motivations and Goals": [
                     "Why are you interested in becoming a nurse?",
                     "Describe an experience in a healthcare setting that solidified your desire to pursue nursing.",
@@ -2731,7 +2731,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Medical Residency": {
+            "Residency Training": {
                 "Motivations and Goals": [
                     "Why have you chosen to specialize in this specific field?",
                     "Describe an experience in a clinical setting that solidified your desire to pursue this specialty.",
@@ -2775,7 +2775,7 @@
                     "What question should I have asked you that I didn't?"
                 ]
             },
-            "Public Health School": {
+            "Master of Public Health": {
                 "Motivations and Goals": [
                     "Why are you interested in pursuing a degree in Public Health?",
                     "What is a specific public health issue you are passionate about, and why?",

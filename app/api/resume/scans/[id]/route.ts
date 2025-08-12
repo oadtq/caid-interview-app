@@ -8,8 +8,8 @@ const supabase = createClient(
 
 export async function DELETE(request: Request, context: any) {
   try {
-    const { params } = context as { params: { id: string } }
-    const scanId = params.id
+    const { params } = context as { params: Promise<{ id: string }> }
+    const { id: scanId } = await params
 
     const { error } = await supabase
       .from('resume_scans')

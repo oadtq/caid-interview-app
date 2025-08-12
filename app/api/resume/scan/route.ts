@@ -231,9 +231,19 @@ Please respond in JSON format:
 
     let aiFeedback
     try {
-      aiFeedback = JSON.parse(completion.choices[0].message.content || '{}')
+      let content = completion.choices[0].message.content || '{}'
+      
+      // Strip markdown code blocks if present
+      if (content.includes('```json')) {
+        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+      } else if (content.includes('```')) {
+        content = content.replace(/```\n?/g, '')
+      }
+      
+      aiFeedback = JSON.parse(content)
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
+      console.error('Raw content:', completion.choices[0].message.content)
       // Fallback feedback
       aiFeedback = {
         overall_score: 7,

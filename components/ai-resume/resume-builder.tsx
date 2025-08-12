@@ -89,20 +89,14 @@ export function ResumeBuilder() {
   const [selectedRole, setSelectedRole] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedResume, setGeneratedResume] = useState<any>(null)
-  const [isEnhancingDescription, setIsEnhancingDescription] = useState<string | null>(null)
-  const [previewExperienceId, setPreviewExperienceId] = useState<string | null>(null)
   const [showTargetRoleWarning, setShowTargetRoleWarning] = useState(false)
-  const [previewEducationDetails, setPreviewEducationDetails] = useState<string | null>(null)
-  const [previewEducationId, setPreviewEducationId] = useState<string | null>(null)
-  const [isEnhancingEducation, setIsEnhancingEducation] = useState<string | null>(null)
-  const [previewDescriptions, setPreviewDescriptions] = useState<{ [key: string]: string | null }>({})
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
 
-  const years = Array.from({ length: 30 }, (_, i) => (new Date().getFullYear() - i).toString())
+  const years = Array.from({ length: 35 }, (_, i) => (new Date().getFullYear() + 5 - i).toString())
 
   const countries = [
     'Vietnam', 'United States', 'United Kingdom', 'Canada', 'Australia',
@@ -230,77 +224,6 @@ export function ResumeBuilder() {
 
   const removeLanguage = (id: string) => {
     setLanguages(languages.filter(lang => lang.id !== id))
-  }
-
-  const handleChatSubmit = async (experienceId: string) => {
-    const currentDescription = workExperiences.find(exp => exp.id === experienceId)?.description || ''
-    if (!currentDescription.trim()) return
-
-    // Check if target role is set
-    if (!targetJobTitle.trim()) {
-      setShowTargetRoleWarning(true)
-      return
-    }
-
-    setIsEnhancingDescription(experienceId)
-    console.log('Submitting description for enhancement:', currentDescription)
-    console.log('Experience ID:', experienceId)
-
-    try {
-      const requestBody = {
-        description: currentDescription,
-        jobTitle: workExperiences.find(exp => exp.id === experienceId)?.jobTitle || '',
-        company: workExperiences.find(exp => exp.id === experienceId)?.companyName || '',
-        targetRole: targetJobTitle || ''
-      }
-      
-      console.log('Request body:', requestBody)
-
-      const response = await fetch('/api/resume/enhance-description', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      console.log('Response status:', response.status)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('API response:', result)
-        setPreviewDescriptions(prev => ({
-          ...prev,
-          [experienceId]: result.enhanced_description
-        }))
-        setPreviewExperienceId(experienceId)
-      } else {
-        const errorText = await response.text()
-        console.error('API error:', errorText)
-        // Fallback to mock enhancement
-        const enhancedDescription = `• Accomplished significant improvements in team productivity as measured by 25% reduction in project delivery time, by implementing agile methodologies and cross-functional collaboration
-• Delivered high-quality software solutions as measured by 99.5% uptime and zero critical bugs, by establishing comprehensive testing protocols and code review processes
-• Led strategic initiatives as measured by $2M cost savings annually, by optimizing system architecture and automating manual processes`
-        setPreviewDescriptions(prev => ({
-          ...prev,
-          [experienceId]: enhancedDescription
-        }))
-        setPreviewExperienceId(experienceId)
-      }
-    } catch (error) {
-      console.error('Error enhancing description:', error)
-      // Fallback to mock enhancement
-      const enhancedDescription = `• Accomplished significant improvements in team productivity as measured by 25% reduction in project delivery time, by implementing agile methodologies and cross-functional collaboration
-• Delivered high-quality software solutions as measured by 99.5% uptime and zero critical bugs, by establishing comprehensive testing protocols and code review processes
-• Led strategic initiatives as measured by $2M cost savings annually, by optimizing system architecture and automating manual processes`
-      setPreviewDescriptions(prev => ({
-        ...prev,
-        [experienceId]: enhancedDescription
-      }))
-      setPreviewExperienceId(experienceId)
-    } finally {
-      setIsEnhancingDescription(null)
-    }
   }
 
   const generateOutput = async () => {
@@ -460,95 +383,6 @@ export function ResumeBuilder() {
 
   const getSuggestedSkills = () => {
     return roleSkillSuggestions[selectedRole as keyof typeof roleSkillSuggestions] || []
-  }
-
-  const handleAcceptPreview = () => {
-    if (previewExperienceId && previewDescriptions[previewExperienceId]) {
-      updateWorkExperience(previewExperienceId, 'description', previewDescriptions[previewExperienceId] || '')
-      setPreviewDescriptions(prev => ({ ...prev, [previewExperienceId]: null }))
-      setPreviewExperienceId(null)
-      // Keep the chat box open - don't close it
-      // setShowChatBox(null) - removed this line
-      // setChatInputs(prev => ({ ...prev, [previewExperienceId]: '' })) - removed this line
-    }
-  }
-
-  const handleDeclinePreview = () => {
-    if (previewExperienceId) {
-      setPreviewDescriptions(prev => ({ ...prev, [previewExperienceId]: null }))
-      setPreviewExperienceId(null)
-    }
-  }
-
-  const handleEducationEnhancement = async (educationId: string) => {
-    const educationItem = education.find((edu: Education) => edu.id === educationId)
-    if (!educationItem) return
-
-    // Check if target role is set
-    if (!targetJobTitle.trim()) {
-      setShowTargetRoleWarning(true)
-      return
-    }
-
-    setIsEnhancingEducation(educationId)
-
-    try {
-      const requestBody = {
-        description: educationItem.additionalDetails || '',
-        degreeProgram: educationItem.degreeProgram || '',
-        fieldOfStudy: educationItem.fieldOfStudy || '',
-        school: educationItem.school || '',
-        targetRole: targetJobTitle || ''
-      }
-
-      const response = await fetch('/api/resume/enhance-education', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        setPreviewEducationDetails(result.enhanced_description)
-        setPreviewEducationId(educationId)
-      } else {
-        // Fallback to mock enhancement
-        const enhancedDescription = `• Graduated with distinction, maintaining a 3.8 GPA while balancing academic excellence with leadership roles in student organizations
-• Completed comprehensive coursework in ${educationItem.fieldOfStudy || 'relevant field'}, including advanced projects that demonstrated practical application of theoretical concepts
-• Served as ${educationItem.degreeProgram || 'Student'} representative, organizing academic events and mentoring junior students
-• Participated in research projects and internships that provided hands-on experience in ${targetJobTitle || 'the field'}`
-
-        setPreviewEducationDetails(enhancedDescription)
-        setPreviewEducationId(educationId)
-      }
-    } catch (error) {
-      console.error('Error enhancing education:', error)
-      // Fallback to mock enhancement
-      const enhancedDescription = `• Graduated with distinction, maintaining a 3.8 GPA while balancing academic excellence with leadership roles in student organizations
-• Completed comprehensive coursework in ${educationItem.fieldOfStudy || 'relevant field'}, including advanced projects that demonstrated practical application of theoretical concepts
-• Served as ${educationItem.degreeProgram || 'Student'} representative, organizing academic events and mentoring junior students
-• Participated in research projects and internships that provided hands-on experience in ${targetJobTitle || 'the field'}`
-
-      setPreviewEducationDetails(enhancedDescription)
-      setPreviewEducationId(educationId)
-    } finally {
-      setIsEnhancingEducation(null)
-    }
-  }
-
-  const handleAcceptEducationPreview = () => {
-    if (previewEducationId && previewEducationDetails) {
-      updateEducation(previewEducationId, 'additionalDetails', previewEducationDetails)
-      setPreviewEducationDetails(null)
-      setPreviewEducationId(null)
-    }
-  }
-
-  const handleDeclineEducationPreview = () => {
-    setPreviewEducationDetails(null)
-    setPreviewEducationId(null)
   }
 
   if (currentStep === 'output') {
@@ -960,76 +794,15 @@ export function ResumeBuilder() {
                   {/* Always visible details section */}
                   <div className="col-span-2">
                     <Label className="text-sm font-medium text-gray-700 mb-2 block">Job Description & Achievements</Label>
-                    <div className="relative">
-                      <Textarea 
-                        placeholder={`• Describe your key responsibilities and achievements in this role
+                    <Textarea 
+                      placeholder={`• Describe your key responsibilities and achievements in this role
 • Use the format: Accomplished [X] as measured by [Y], by doing [Z]
 • Include quantifiable results, metrics, and impact
 • Focus on achievements rather than just responsibilities`}
-                        value={exp.description}
-                        onChange={(e) => updateWorkExperience(exp.id, 'description', e.target.value)}
-                        className="min-h-[120px] pr-32"
-                      />
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleChatSubmit(exp.id)}
-                        disabled={isEnhancingDescription === exp.id}
-                        className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        {isEnhancingDescription === exp.id ? (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4 animate-spin" />
-                            Enhancing...
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <Sparkles className="h-4 w-4" />
-                            Improve with AI
-                          </div>
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* Preview AI-enhanced description */}
-                    {previewDescriptions[exp.id] && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
-                      >
-                        <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-                          <Sparkles className="h-4 w-4" />
-                          AI-Enhanced Description Preview
-                        </h4>
-                        <div className="text-sm text-blue-800 whitespace-pre-line mb-4">
-                          {previewDescriptions[exp.id]}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            onClick={() => {
-                              updateWorkExperience(exp.id, 'description', previewDescriptions[exp.id] || '');
-                              setPreviewDescriptions(prev => ({ ...prev, [exp.id]: null }));
-                              setPreviewExperienceId(null);
-                              // Keep the chat box open - don't close it
-                              // setShowChatBox(null); - removed this line
-                              // setChatInputs(prev => ({ ...prev, [exp.id]: '' })) - removed this line
-                            }}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Accept & Apply
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => setPreviewDescriptions(prev => ({ ...prev, [exp.id]: null }))}
-                            className="border-red-300 text-red-700 hover:bg-red-50"
-                          >
-                            Decline
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
+                      value={exp.description}
+                      onChange={(e) => updateWorkExperience(exp.id, 'description', e.target.value)}
+                      className="min-h-[120px]"
+                    />
                   </div>
                 </div>
               ))}
@@ -1125,66 +898,12 @@ export function ResumeBuilder() {
                     </div>
                     <div className="col-span-2">
                       <Label className="text-sm font-medium text-gray-700 mb-2 block">Add any additional education details (optional)</Label>
-                      <div className="relative">
-                        <Textarea 
-                          placeholder={`• GPA\n• Relevant courses\n• Awards or Honors\n• Extracurricular activities`}
-                          value={edu.additionalDetails}
-                          onChange={(e) => updateEducation(edu.id, 'additionalDetails', e.target.value)}
-                          className="min-h-[120px] pr-32"
-                        />
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleEducationEnhancement(edu.id)}
-                          disabled={isEnhancingEducation === edu.id}
-                          className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          {isEnhancingEducation === edu.id ? (
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4 animate-spin" />
-                              Enhancing...
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1">
-                              <Sparkles className="h-4 w-4" />
-                              Improve with AI
-                            </div>
-                          )}
-                        </Button>
-                      </div>
-
-                      {/* Preview AI-enhanced education details */}
-                      {previewEducationDetails && previewEducationId === edu.id && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
-                        >
-                          <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-                            <Sparkles className="h-4 w-4" />
-                            AI-Enhanced Education Details Preview
-                          </h4>
-                          <div className="text-sm text-blue-800 whitespace-pre-line mb-4">
-                            {previewEducationDetails}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              onClick={handleAcceptEducationPreview}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              Accept & Apply
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              onClick={handleDeclineEducationPreview}
-                              className="border-red-300 text-red-700 hover:bg-red-50"
-                            >
-                              Decline
-                            </Button>
-                          </div>
-                        </motion.div>
-                      )}
+                      <Textarea 
+                        placeholder={`• GPA\n• Relevant courses\n• Awards or Honors\n• Extracurricular activities`}
+                        value={edu.additionalDetails}
+                        onChange={(e) => updateEducation(edu.id, 'additionalDetails', e.target.value)}
+                        className="min-h-[120px]"
+                      />
                     </div>
                   </div>
                 </div>
