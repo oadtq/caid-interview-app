@@ -5,7 +5,7 @@ import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useState, useEffect } from "react"
-import { FileText, Calendar, Download, Eye, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ChevronDown, ChevronUp, Target, Type, Layout, Shield } from 'lucide-react'
+import { FileText, Calendar, Eye, Trash2, ArrowLeft, CheckCircle, AlertTriangle, ChevronDown, ChevronUp, Target, Type, Layout, Shield } from 'lucide-react'
 
 interface ScanData {
   id: string
@@ -187,32 +187,6 @@ export function MyScans() {
     } catch (error) {
       console.error('Error deleting scan:', error)
       alert('Failed to delete scan. Please try again.')
-    }
-  }
-
-  const handleDownload = async (scanId: string) => {
-    try {
-      const response = await fetch(`/api/resume/scans/${scanId}/download`)
-      
-      if (!response.ok) {
-        throw new Error('Failed to download scan')
-      }
-
-      // Create a blob from the response
-      const blob = await response.blob()
-      
-      // Create a download link
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'resume_analysis.json'
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      console.error('Error downloading scan:', error)
-      alert('Failed to download scan. Please try again.')
     }
   }
 
@@ -528,15 +502,6 @@ export function MyScans() {
                           >
                             <Eye className="h-4 w-4" />
                             View Feedback
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownload(scan.id)}
-                            className="flex items-center gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            Download
                           </Button>
                           <Button
                             variant="outline"

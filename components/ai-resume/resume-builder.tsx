@@ -304,6 +304,47 @@ export function ResumeBuilder() {
   }
 
   const generateOutput = async () => {
+    // Validate required fields
+    const validationErrors = []
+    
+    // Check work experience required fields
+    const validWorkExperiences = workExperiences.filter(exp => 
+      exp.jobTitle.trim() && 
+      exp.companyName.trim() && 
+      exp.city.trim() && 
+      exp.country.trim() && 
+      exp.startMonth.trim() && 
+      exp.startYear.trim()
+    )
+    
+    if (validWorkExperiences.length === 0) {
+      validationErrors.push('At least one complete work experience is required (job title, company, city, country, start month/year)')
+    }
+    
+    // Check education required fields
+    const validEducation = education.filter(edu => 
+      edu.school.trim() && 
+      edu.schoolLocation.trim() && 
+      edu.degreeProgram.trim() && 
+      edu.graduationYear.trim()
+    )
+    
+    if (validEducation.length === 0) {
+      validationErrors.push('At least one complete education entry is required (school, location, degree program, graduation year)')
+    }
+    
+    // Check if at least one skill is provided
+    const validSkills = skills.filter(skill => skill.skill.trim())
+    if (validSkills.length === 0) {
+      validationErrors.push('At least one skill is required')
+    }
+    
+    // Show validation errors if any
+    if (validationErrors.length > 0) {
+      alert('Please complete the following required fields:\n\n• ' + validationErrors.join('\n• '))
+      return
+    }
+
     setIsGenerating(true)
 
     try {
@@ -687,14 +728,14 @@ export function ResumeBuilder() {
             )}
 
             {/* Download Section */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm text-center">
+            {/* <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume Template Download</h3>
               <p className="text-gray-600 mb-6">Choose a resume template to download your AI-optimized resume.</p>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Download className="h-4 w-4 mr-2" />
                 Download My Resume
               </Button>
-            </div>
+            </div> */}
 
             {/* Back Button */}
             <div className="text-center">

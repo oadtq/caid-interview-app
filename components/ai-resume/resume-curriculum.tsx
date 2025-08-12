@@ -11,7 +11,6 @@ export function ResumeCurriculum() {
   const [isExpanded, setIsExpanded] = useState(true)
   const [activeTab, setActiveTab] = useState("transcript")
   const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({})
   const [showQuizResults, setShowQuizResults] = useState(false)
 
@@ -26,7 +25,6 @@ export function ResumeCurriculum() {
     id: index + 1,
     title: item.Title,
     duration: "10:00", // Default duration since not provided in JSON
-    completed: false,
     current: index === 0,
     videoId: extractVideoId(item.Link),
     mcqs: item.MCQs
@@ -304,7 +302,6 @@ export function ResumeCurriculum() {
 
               <div className="mb-4">
                 <h2 className="text-xl font-bold text-gray-900 mb-1">Resume Mastery</h2>
-                <div className="text-right text-sm text-gray-500">0 / {lessons.length}</div>
               </div>
 
               {/* Course Section */}
@@ -321,7 +318,6 @@ export function ResumeCurriculum() {
                     )}
                     <span className="font-medium text-gray-900">1. Resume Curriculum</span>
                   </div>
-                  <span className="text-sm text-gray-500">0/{lessons.length}</span>
                 </button>
 
                 {isExpanded && (
@@ -341,16 +337,12 @@ export function ResumeCurriculum() {
                           <div className="mt-1">
                             <div
                               className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                lesson.completed
-                                  ? "bg-green-500 border-green-500"
-                                  : index === currentLesson
-                                    ? "border-blue-500 bg-blue-500"
-                                    : "border-gray-300 hover:border-blue-300"
+                                index === currentLesson
+                                  ? "border-blue-500 bg-blue-500"
+                                  : "border-gray-300 hover:border-blue-300"
                               }`}
                             >
-                              {lesson.completed ? (
-                                <CheckCircle className="w-3 h-3 text-white" />
-                              ) : index === currentLesson ? (
+                              {index === currentLesson ? (
                                 <Play className="w-3 h-3 text-white" />
                               ) : (
                                 <Play className="w-3 h-3 text-gray-400" />
@@ -380,7 +372,7 @@ export function ResumeCurriculum() {
             </div>
 
             {/* Progress Summary */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+            {/* <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
               <h3 className="font-semibold text-blue-900 mb-2">Your Progress</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-blue-800">
@@ -395,7 +387,7 @@ export function ResumeCurriculum() {
                   <div className="bg-blue-600 h-2 rounded-full w-0 transition-all duration-300"></div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

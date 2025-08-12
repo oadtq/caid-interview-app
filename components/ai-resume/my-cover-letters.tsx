@@ -6,7 +6,7 @@ import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Download, Eye, Edit, Calendar, Building, Plus, Search, Filter, Loader2, Save, X } from "lucide-react"
+import { Mail, Download, Eye, Edit, Calendar, Building, Plus, Search, Filter, Loader2, Save, X, Trash2 } from "lucide-react"
 
 interface CoverLetter {
   id: string
@@ -115,6 +115,32 @@ export function MyCoverLetters({ setActiveTab }: MyCoverLettersProps) {
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
+  }
+
+  const handleDelete = async (letterId: string) => {
+    if (!confirm('Are you sure you want to delete this cover letter? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/cover-letter/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: letterId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete cover letter')
+      }
+
+      // Remove the cover letter from the local state
+      setCoverLetters(prev => prev.filter(letter => letter.id !== letterId))
+    } catch (error) {
+      console.error('Error deleting cover letter:', error)
+      setError('Failed to delete cover letter. Please try again.')
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -246,8 +272,6 @@ export function MyCoverLetters({ setActiveTab }: MyCoverLettersProps) {
                           <span>{getWordCount(letter.content)} words</span>
                           <span>•</span>
                           <span>{letter.tone} tone</span>
-                          <span>•</span>
-                          <span>Technology</span>
                         </div>
                       </div>
                     </div>
@@ -279,6 +303,15 @@ export function MyCoverLetters({ setActiveTab }: MyCoverLettersProps) {
                       >
                         <Download className="h-4 w-4 mr-1" />
                         Download
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(letter.id)}
+                        className="border-red-200 text-red-600 hover:bg-red-50 bg-transparent"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
                       </Button>
                     </div>
                   </div>
