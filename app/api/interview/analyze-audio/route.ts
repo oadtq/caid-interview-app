@@ -41,26 +41,15 @@ export async function POST(request: NextRequest) {
     // Ask for rich, structured feedback compatible with the new UI
     const analysisPrompt = `
 You are an expert interview coach analyzing a candidate's response to an interview question.
-Return feedback BOTH in a legacy format (1-10 scores) and a rich detailed format used by a frontend dashboard.
+The candidate is a student at VinUniversity from Vietnam.
+Return feedback in a rich detailed format used by a frontend dashboard.
 
 Question: "${questionText}"
 Response: "${transcribedText}"
 
 First infer: total words, duration in seconds if you can from speech pacing (assume 150 wpm if not provided), WPM, disfluency counts (um/uh/er/ah), filler words (basically, you know, kind of, sort of, actually, like), negative tone phrases, and power words (led, owned, delivered, achieved, improved, implemented, designed, launched, optimized, streamlined, innovated, mentored, built, created, managed).
 
-Return STRICT JSON with two top-level keys: legacy and detailed.
-- legacy has shape:
-  {
-    "overall_score": number (1-10),
-    "content_quality": { "score": number, "feedback": string },
-    "communication_skills": { "score": number, "feedback": string },
-    "professionalism": { "score": number, "feedback": string },
-    "use_of_examples": { "score": number, "feedback": string },
-    "strengths": string[],
-    "areas_for_improvement": string[],
-    "overall_feedback": string
-  }
-- detailed has shape:
+Return STRICT JSON with top-level keys:
   {
     "overallPerformance": { "score": number (0-100), "status": "excellent"|"good"|"caution"|"poor", "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[], "overallSummary": string },
     "answerRelevance": { "score": number, "status": string, "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[] },
@@ -78,11 +67,11 @@ Return STRICT JSON with two top-level keys: legacy and detailed.
   }
 
 Rules:
-- overallPerformance.score is 0-100; legacy.overall_score is 1-10.
+- overallPerformance.score is 0-100.
 - Map statuses by score: >=85 excellent, >=70 good, >=50 caution, else poor.
 - If duration seconds unknown, estimate by words/150*60.
 - per100Words = round((count/totalWords)*100, 2). If totalWords is 0, return 0.
-- All strings must be concise, professional, and actionable.
+- All strings must be detailed, professional, and actionable.
 
 Respond with JSON only.`
 
@@ -109,142 +98,133 @@ Respond with JSON only.`
       console.error('Failed to parse AI response:', parseError)
     }
 
-    // Fallback structures if parsing fails or missing keys
-    const legacyFallback = {
-      overall_score: 7,
-      content_quality: { score: 7, feedback: 'Good response with room for improvement.' },
-      communication_skills: { score: 7, feedback: 'Clear communication overall.' },
-      professionalism: { score: 8, feedback: 'Professional tone maintained.' },
-      use_of_examples: { score: 6, feedback: 'Could benefit from more specific examples.' },
-      strengths: ['Clear speaking', 'Professional demeanor'],
-      areas_for_improvement: ['Add more specific examples', 'Structure responses better'],
-      overall_feedback: 'Good response overall with opportunities for enhancement.'
-    }
-
     const detailedFallback = {
       overallPerformance: {
-        score: 70,
-        status: 'good',
-        summary: 'Solid response with room for improvement',
+        score: 0,
+        status: 'poor',
+        summary: 'No response detected. This low score may be due to a system error or no audio was provided. If you believe this is a mistake, please report the issue.',
         description: 'Overall performance across content, delivery, and professionalism.',
-        detailedAnalysis: 'Good foundation; refine structure and add quantifiable outcomes.',
-        examples: ['Maintained professional tone'],
-        tips: ['Use STAR structure for examples'],
-        overallSummary: 'Good overall; improve clarity and specificity.'
+        detailedAnalysis: 'No answer was detected, so no feedback can be provided. This may be due to a technical issue or no audio input.',
+        examples: [],
+        tips: ['Ensure your microphone is working and try again'],
+        overallSummary: 'No response detected; please check your setup or report a possible system failure.'
       },
       answerRelevance: {
-        score: 75,
-        status: 'good',
-        summary: 'Mostly on-topic and relevant',
+        score: 0,
+        status: 'poor',
+        summary: 'No relevant answer detected',
         description: 'Focus and alignment with the question.',
-        detailedAnalysis: 'Addresses question; tighten scope to core points.',
+        detailedAnalysis: 'No content was provided to assess relevance.',
         examples: [],
-        tips: ['Lead with a direct answer, then support it']
+        tips: ['Speak clearly and answer the question directly']
       },
       paceOfSpeech: {
-        score: 80,
-        status: 'good',
-        summary: 'Comfortable pace',
+        score: 0,
+        status: 'poor',
+        summary: 'No speech detected',
         description: 'Speaking rate and clarity.',
-        detailedAnalysis: 'Within comfortable range.',
+        detailedAnalysis: 'No words detected to analyze pace.',
         examples: [],
-        tips: ['Pause between key points'],
-        wpm: 140,
+        tips: ['Speak at a natural pace'],
+        wpm: 0,
         optimalRange: '115-180 WPM'
       },
       umCounter: {
-        score: 80,
-        status: 'good',
-        summary: 'Low disfluencies',
+        score: 0,
+        status: 'poor',
+        summary: 'No disfluencies detected',
         description: 'Counts disfluencies.',
-        detailedAnalysis: 'Minor disfluencies present.',
+        detailedAnalysis: 'No speech detected to analyze disfluencies.',
         examples: [],
-        tips: ['Replace fillers with brief pauses'],
-        count: 2,
-        per100Words: 1
+        tips: ['Speak clearly and avoid filler words'],
+        count: 0,
+        per100Words: 0
       },
       vocabulary: {
-        score: 80,
-        status: 'good',
-        summary: 'Professional vocabulary',
+        score: 0,
+        status: 'poor',
+        summary: 'No vocabulary detected',
         description: 'Sophistication and appropriateness.',
-        detailedAnalysis: 'Clear and professional.',
+        detailedAnalysis: 'No words detected to assess vocabulary.',
         examples: [],
-        tips: ['Avoid jargon unless necessary'],
-        level: 'Professional',
-        gradeLevel: 12
+        tips: ['Use professional language'],
+        level: 'N/A',
+        gradeLevel: 0
       },
       powerWords: {
-        score: 75,
-        status: 'good',
-        summary: 'Some impactful verbs used',
+        score: 0,
+        status: 'poor',
+        summary: 'No power words detected',
         description: 'Action-oriented language.',
-        detailedAnalysis: 'Add more quantified results with power verbs.',
+        detailedAnalysis: 'No speech detected to analyze power words.',
         examples: [],
-        tips: ['Lead bullet points with verbs'],
-        count: 4,
-        words: ['led','delivered','achieved','implemented']
+        tips: ['Use strong, action-oriented verbs'],
+        count: 0,
+        words: []
       },
       fillerWords: {
-        score: 80,
-        status: 'good',
-        summary: 'Few filler words',
+        score: 0,
+        status: 'poor',
+        summary: 'No filler words detected',
         description: 'Non-essential phrases.',
-        detailedAnalysis: 'Minimize fillers to sharpen delivery.',
+        detailedAnalysis: 'No speech detected to analyze filler words.',
         examples: [],
-        tips: ['Practice concise phrasing'],
-        count: 3,
-        per100Words: 2,
-        commonWords: ['like']
+        tips: ['Minimize filler words for clarity'],
+        count: 0,
+        per100Words: 0,
+        commonWords: []
       },
       pauseCounter: {
-        score: 85,
-        status: 'excellent',
-        summary: 'Natural use of pauses',
+        score: 0,
+        status: 'poor',
+        summary: 'No pauses detected',
         description: 'Strategic pauses for emphasis.',
-        detailedAnalysis: 'Good rhythm supports comprehension.',
+        detailedAnalysis: 'No speech detected to analyze pauses.',
         examples: [],
-        tips: ['Pause before key claims'],
-        quality: 'Natural'
+        tips: ['Use pauses to emphasize key points'],
+        quality: 'N/A'
       },
       negativeTone: {
-        score: 95,
+        score: 0,
         status: 'excellent',
         summary: 'No negative language detected',
         description: 'Presence of pessimistic phrasing.',
-        detailedAnalysis: 'Positive framing maintained.',
+        detailedAnalysis: 'No speech detected; no negative language present.',
         examples: [],
-        tips: ['Continue positive framing'],
+        tips: ['Maintain positive framing'],
         count: 0,
         phrases: []
       },
       length: {
-        score: 90,
-        status: 'excellent',
-        summary: 'Good length',
+        score: 0,
+        status: 'poor',
+        summary: 'No response length detected',
         description: 'Appropriate duration.',
-        detailedAnalysis: 'Fits within the 1-2 minute target.',
+        detailedAnalysis: 'No audio detected to assess duration.',
         examples: [],
-        tips: ['Maintain similar depth and brevity'],
-        duration: '01:15',
-        seconds: 75,
-        optimalRange: true
+        tips: ['Aim for a 1-2 minute response'],
+        duration: '00:00',
+        seconds: 0,
+        optimalRange: false
       },
       authenticityScore: {
-        score: 90,
-        status: 'excellent',
-        summary: 'Conversational and genuine',
+        score: 0,
+        status: 'poor',
+        summary: 'No delivery detected',
         description: 'Natural delivery.',
-        detailedAnalysis: 'Not overly scripted.',
+        detailedAnalysis: 'No speech detected to assess authenticity.',
         examples: [],
-        tips: ['Keep it conversational'],
-        conversationalLevel: 'Highly Conversational'
+        tips: ['Speak naturally and avoid reading'],
+        conversationalLevel: 'N/A'
       },
-      strengths: ['Clear structure', 'Professional tone'],
-      improvements: ['Add quantifiable outcomes', 'Tighten transitions']
+      strengths: [],
+      improvements: [
+        'Ensure your microphone is working and audio is recorded',
+        'Try again and provide a spoken response',
+        'If this is a system error, please report the issue'
+      ]
     }
 
-    const legacy = parsed?.legacy || legacyFallback
     const detailed = parsed?.detailed || detailedFallback
 
     // Derive duration/wpm if missing
@@ -263,18 +243,16 @@ Respond with JSON only.`
       detailed.paceOfSpeech.wpm = Math.round((totalWords || 180) / (mins || 1))
       detailed.paceOfSpeech.summary = `${detailed.paceOfSpeech.wpm} words per minute`
     }
-
-    // Persist both legacy (for compatibility) and detailed (for new UI)
+    
+    // Persist detailed (for new UI)
     const { error: updateError } = await supabase
       .from('interview_responses')
       .update({
         transcription: transcribedText,
         ai_feedback: {
-          ...legacy,
-          // attach detailed under a namespaced key for forward-compat
           detailed
         },
-        overall_score: legacy.overall_score,
+        overall_score: detailed.overallPerformance.score,
         updated_at: new Date().toISOString()
       })
       .eq('id', responseId)
@@ -289,7 +267,7 @@ Respond with JSON only.`
 
     return NextResponse.json({
       transcription: transcribedText,
-      feedback: { legacy, detailed }
+      feedback: detailed
     })
 
   } catch (error) {

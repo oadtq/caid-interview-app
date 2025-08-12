@@ -562,14 +562,17 @@ export function ResumeBuilder() {
             )}
 
             {/* Download Section */}
-            {/* <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm text-center">
+            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume Template Download</h3>
               <p className="text-gray-600 mb-6">Choose a resume template to download your AI-optimized resume.</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => window.open(window.location.origin + "/ai-resume?tab=templates", '_blank')}
+              >
                 <Download className="h-4 w-4 mr-2" />
-                Download My Resume
+                Download CV Template
               </Button>
-            </div> */}
+            </div>
 
             {/* Back Button */}
             <div className="text-center">
