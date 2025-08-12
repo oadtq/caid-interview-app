@@ -1,0 +1,1310 @@
+{
+"Lessons": [
+    {
+        "Name": "Interview Foundations",
+        "Videos": [
+        {
+            "Title": "5 Things You Need to Ace the Interview",
+            "Link": "https://www.youtube.com/watch?v=QkPRpz56aEg&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr&index=5",
+            "Description": "5 things that recruiters, hiring managers, and interviewers look for during the interview. This includes communication ability, energy level, fit, you can do the job and you genuinely want this job. ",
+            "MCQs": [
+                {
+                    "Question": "According to the video, which of the following is NOT a communication skill hiring managers look for?",
+                    "Options": [
+                        "A. The ability to articulate your thoughts effectively.",
+                        "B. Using complex vocabulary to sound intelligent.",
+                        "C. Telling compelling stories about your experiences.",
+                        "D. Preparing and practicing your answers in advance."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is meant by \"energy level\" in an interview, as described in the video?",
+                    "Options": [
+                        "A. Your physical fitness and stamina.",
+                        "B. The amount of caffeine you've consumed.",
+                        "C. The positive, personable, and friendly demeanor you project.",
+                        "D. Your ability to work long hours without getting tired."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video explains that \"fit\" for a company can be based on which of the following?",
+                    "Options": [
+                        "A. Cultural, technical, and personality-based factors.",
+                        "B. Your physical height and weight.",
+                        "C. The number of social media followers you have.",
+                        "D. Your favorite sports team."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "To show you have the \"ability to do the job,\" what does the video suggest you do if you lack direct experience?",
+                    "Options": [
+                        "A. Lie about your past experiences.",
+                        "B. Avoid mentioning your lack of experience.",
+                        "C. Connect the dots between your past experiences and the job requirements.",
+                        "D. Argue that experience is not important."
+                    ],
+                    "Answer": "C"
+                },  
+                {
+                    "Question": "Why is showing \"genuine interest in the job\" important to an interviewer?",
+                    "Options": [
+                        "A. It makes you seem desperate for a job.",
+                        "B. It's a key factor for getting hired, as a lack of interest is a major turn-off.",
+                        "C. It allows you to ask for a higher salary.",
+                        "D. It's not important, as long as you can do the work."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "Crafting Your Personal Brand",
+            "Link": "https://www.youtube.com/watch?v=yKCUTZaKgNA&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr&index=8&pp=iAQB",
+            "Description": "How to sell yourself effectively in the interview",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the most important skill for getting a good job?",
+                    "Options": [
+                        "A. Having a high GPA.",
+                        "B. Being able to sell yourself effectively.",
+                        "C. Knowing how to code.",
+                        "D. Having a well-designed resume."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The host mentions that her strategies have helped clients achieve which of the following?",
+                    "Options": [
+                        "A. Get jobs they are not passionate about.",
+                        "B. Land five and six-figure job offers.",
+                        "C. Work for companies they dislike.",
+                        "D. Avoid interviews altogether."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the main message of the video \"Crafting Your Personal Brand\"?",
+                    "Options": [
+                        "A. How to use social media for job hunting.",
+                        "B. The importance of having a strong resume.",
+                        "C. How to sell yourself effectively in an interview.",
+                        "D. The benefits of working for large companies."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video suggests that knowing how to sell yourself can help you find which kind of job?",
+                    "Options": [
+                        "A. A job with a high salary, regardless of the work.",
+                        "B. A job with the least amount of responsibility.",
+                        "C. A career path that you will truly enjoy.",
+                        "D. A job at any company, big or small."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the central idea behind \"crafting your personal brand\"?",
+                    "Options": [
+                        "A. Creating a unique and memorable online profile.",
+                        "B. Highlighting your unique value and skills.",
+                        "C. Only applying to jobs at well-known companies.",
+                        "D. Dressing in expensive clothes for interviews."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "Mindset & Confidence Prep",
+            "Link": "https://www.youtube.com/watch?v=jQfVn2zakKQ&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr&index=23",
+            "Description": "Building confidence and the right mindset for interviews",
+            "MCQs": [
+                {
+                    "Question": "What is the first tip given in the video to help build confidence for an interview?",
+                    "Options": [
+                        "A. Use the power of persuasion.",
+                        "B. Remember your value.",
+                        "C. Visualize the interview going well.",
+                        "D. Have extra stories prepared."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video defines persuasion in an interview as:",
+                    "Options": [
+                        "A. Manipulating the interviewer to hire you.",
+                        "B. Influencing the hiring manager that you are the ideal candidate.",
+                        "C. Being overly aggressive in your answers.",
+                        "D. Convincing the interviewer to give you a higher salary."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "When framing your answers for behavioral questions, what is the recommended approach?",
+                    "Options": [
+                        "A. Provide a brief, one-word answer.",
+                        "B. Start with the resolution and then explain the situation.",
+                        "C. Start by setting up the story and describing the situation first.",
+                        "D. Avoid giving a story and stick to the facts."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "Why is it important to have \"extra stories in your back pocket\"?",
+                    "Options": [
+                        "A. To make the interview longer than scheduled.",
+                        "B. To avoid using the same story repeatedly.",
+                        "C. To confuse the interviewer.",
+                        "D. To show off how many experiences you have."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "How does the video suggest using visualization to prepare for an interview?",
+                    "Options": [
+                        "A. Imagining all the possible negative outcomes.",
+                        "B. Picturing yourself answering questions and building rapport successfully.",
+                        "C. Visualizing the interviewer's office.",
+                        "D. Thinking about what you'll do after the interview is over."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "How to Know If Interview Went Well (4 Signs)",
+            "Link": "https://www.youtube.com/watch?v=N83mj9lSBSM",
+            "Description": "How to know if your interview went well",
+            "MCQs": [
+                {
+                    "Question": "What does it mean if an interview extends beyond its scheduled time?",
+                    "Options": [
+                        "A. It's always a negative sign.",
+                        "B. The interviewer is disorganized.",
+                        "C. It can be a good sign of interest.",
+                        "D. It means you talked too much."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "A prepared interviewer who asks thoughtful questions is a sign of what?",
+                    "Options": [
+                        "A. They are trying to trick you.",
+                        "B. They are taking the hiring process seriously.",
+                        "C. They are not interested in the position.",
+                        "D. They want you to struggle with the answers."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "Which of the following is an example of positive body language from an interviewer?",
+                    "Options": [
+                        "A. Lack of eye contact.",
+                        "B. Fidgeting with their hands.",
+                        "C. Smiling and nodding while you speak.",
+                        "D. Crossing their arms."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video states that a successful interview should feel like what?",
+                    "Options": [
+                        "A. A rigid question-and-answer session.",
+                        "B. An interrogation.",
+                        "C. A natural, conversational flow.",
+                        "D. A public speaking engagement."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "If an interviewer asks follow-up questions about details you mentioned, what does this indicate?",
+                    "Options": [
+                        "A. They weren't listening to you.",
+                        "B. They are trying to find a mistake in your story.",
+                        "C. They are intrigued by your answers.",
+                        "D. They are just trying to fill time."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        }
+        ]
+    },
+    {
+        "Name": "Communication Skills",
+        "Videos": [
+        {
+            "Title": "How to Communicate Better in Interviews",
+            "Link": "https://www.youtube.com/watch?v=RMnJfjfsFDE&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr",
+            "Description": "How to communicate better in interviews",
+            "MCQs": [
+                {
+                    "Question": "What is a common mistake job seekers make during interviews?",
+                    "Options": [
+                        "A. Not having enough technical knowledge.",
+                        "B. Giving overly technical answers.",
+                        "C. Not asking questions at the end.",
+                        "D. Using too much storytelling."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "Which analogy does the video use to explain why technical details aren't the most important thing to a hiring manager?",
+                    "Options": [
+                        "A. A mechanic explaining an engine to a car owner.",
+                        "B. A chef describing a recipe to a diner.",
+                        "C. A patient talking to a surgeon about a procedure.",
+                        "D. An architect discussing building plans with a client."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video suggests that your interview stories should reassure the hiring manager of what?",
+                    "Options": [
+                        "A. That you are the most experienced candidate.",
+                        "B. That you are the right person for the job.",
+                        "C. That you can work long hours.",
+                        "D. That you will be a low-maintenance employee."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What are the three key elements of compelling storytelling mentioned in the video?",
+                    "Options": [
+                        "A. Relevance, being the hero, and reassurance.",
+                        "B. Length, detail, and technical accuracy.",
+                        "C. Humor, creativity, and uniqueness.",
+                        "D. Chronology, honesty, and brevity."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "How many compelling stories does the video suggest you have ready for an interview?",
+                    "Options": [
+                        "A. 1 or 2",
+                        "B. 3 to 5",
+                        "C. 10 to 15",
+                        "D. As many as possible"
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "How to Demonstrate Positive Body Language",
+            "Link": "https://www.youtube.com/watch?v=P_SNAODLTxM&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr&index=22",
+            "Description": "How to demonstrate positive body language",
+            "MCQs": [
+                {
+                    "Question": "The video uses an experiment to show that in an interview, what is often more important than what you say?",
+                    "Options": [
+                        "A. The amount of experience you have.",
+                        "B. Your non-verbal communication.",
+                        "C. Your resume.",
+                        "D. Your salary expectations."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What does the video say about being overly enthusiastic in an interview?",
+                    "Options": [
+                        "A. It is always a good thing.",
+                        "B. It can come across as inauthentic or like a performance.",
+                        "C. It shows you are passionate.",
+                        "D. It helps the interviewer feel at ease."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What does \"calm confident tone\" refer to, according to the video?",  
+                    "Options": [
+                        "A. Being overly cocky and arrogant.",
+                        "B. Speaking in a monotone voice.",
+                        "C. Projecting that you are the expert without being cocky.",
+                        "D. Speaking loudly and quickly."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the most important tip the video provides for positive body language?",
+                    "Options": [
+                        "A. Be overly enthusiastic.",   
+                        "B. Make a lot of hand gestures.",
+                        "C. Be present every second.",
+                        "D. Dress in a professional suit."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the benefit of being \"present every second\" during an interview?",
+                    "Options": [
+                        "A. It allows you to improvise and make up answers.",
+                        "B. It helps you seem more confident and prepared.",
+                        "C. It shows you are not nervous.",
+                        "D. It allows you to truly listen to the interviewer and provide thoughtful answers."
+                    ],
+                    "Answer": "D"
+                }
+            ]
+        },
+        {
+            "Title": "STAR vs. CARL Method",
+            "Link": "https://www.youtube.com/watch?v=gZ2354BH0a0",
+            "Description": "Major differences between 2 methods and when to use each techniques",
+            "MCQs": [
+                {
+                    "Question": "The video states that one limitation of the STAR method is that it allocates too much time to which two components?",
+                    "Options": [
+                        "A. Action and Result.",
+                        "B. Situation and Task.",
+                        "C. Situation and Action.",
+                        "D. Task and Result."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What does the \"L\" in the CARL method stand for?",
+                    "Options": [
+                        "A. Lesson.",
+                        "B. List.",
+                        "C. Logic.",
+                        "D. Learnings."
+                    ],
+                    "Answer": "D"
+                },  
+                {
+                    "Question": "Why does the video suggest the CARL method might be more effective than STAR?",
+                    "Options": [
+                        "A. It makes your answers more technical.",
+                        "B. It gives you more time to talk about your learnings, which differentiates a candidate.",
+                        "C. It is easier to memorize.",
+                        "D. It focuses less on your personal experience."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "According to the video, what is a good way to identify your \"learnings\"?",
+                    "Options": [
+                        "A. Ask yourself what you would do differently in a similar situation.",
+                        "B. Ask yourself what the company's biggest challenges are.",
+                        "C. Ask the interviewer to explain what they want to hear.",
+                        "D. Focus only on the positive outcomes."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "When does the video suggest you should still use the STAR format?",
+                    "Options": [
+                        "A. In all interview situations.",
+                        "B. When talking about your learnings.",
+                        "C. When writing bullet points on your resume.",
+                        "D. Never, the CARL method is always better."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        }
+        ]
+    },
+    {
+        "Name": "Common Interview Questions",
+        "Videos": [
+        {
+            "Title": "Tell me about yourself",
+            "Link": "https://www.youtube.com/watch?v=es7XtrloDIQ",
+            "Description": "How to answer the tell me about yourself question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the main purpose of the \"Tell me about yourself\" question?",
+                    "Options": [
+                        "A. To hear a detailed life story.",  
+                        "B. To get a concise professional narrative.",
+                        "C. To test your ability to improvise.",
+                        "D. To find out about your personal hobbies."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "Which of the following is the correct order for the \"Present, Past, Future\" framework?",
+                    "Options": [
+                        "A. Your relevant history, your current role, your future goals.",
+                        "B. Your past achievements, your current skills, why you want the job.",
+                        "C. Your present role, your past experiences, your future contributions to the company.",
+                        "D. Your future plans, your past roles, your present responsibilities."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "In the \"Present, Past, Future\" framework, what should you focus on in the \"Past\" section?",
+                    "Options": [
+                        "A. Discussing every job you've ever had.",
+                        "B. Briefly mentioning your hobbies and interests.",
+                        "C. Highlighting relevant experiences that led you to your current position.",
+                        "D. Explaining why you left your previous jobs."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What should you avoid talking about when answering \"Tell me about yourself\"?",
+                    "Options": [
+                        "A. Your most significant professional achievement.",
+                        "B. How your skills will contribute to the company's success.",
+                        "C. Your personal life or irrelevant experiences.",
+                        "D. The reason you are interested in the specific role."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What does the \"Future\" section of the framework help you demonstrate to the interviewer?",
+                    "Options": [
+                        "A. That you want a promotion.",
+                        "B. Your forward-thinking mindset and enthusiasm for the role.",
+                        "C. Your long-term personal goals.",
+                        "D. Your interest in a different department."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "Why Are You a Good Fit for this Role",
+            "Link": "https://www.youtube.com/watch?v=-HfeTdf2gSw",
+            "Description": "How to answer the why are you a good fit for this role question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the recommended percentage of your answer to dedicate to what you can bring to the role?",
+                    "Options": [
+                        "A. 10%",
+                        "B. 30%",
+                        "C. 50%",
+                        "D. 20%"
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the primary purpose of using a word cloud generator with the job description?",
+                    "Options": [
+                        "A. To create a visually appealing resume.",
+                        "B. To identify key skills and keywords to use in your answer.",
+                        "C. To check for grammar and spelling errors.",
+                        "D. To understand the company's culture."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "According to the video, what should you spend 30% of your answer on?",
+                    "Options": [
+                        "A. What makes you unique.",
+                        "B. Your professional background.",
+                        "C. What you can bring to the role.",
+                        "D. What you are trying to get out of the role."
+                    ],
+                    "Answer": "D"
+                },
+                {
+                    "Question": "What is the main goal of the 20% of the answer dedicated to what makes you unique?",
+                    "Options": [
+                        "A. To list all of your professional achievements.",
+                        "B. To provide a detailed history of your education.",
+                        "C. To be memorable by highlighting a unique aspect or a memorable example.",
+                        "D. To discuss your salary expectations."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video suggests that the total response time for this interview question should be approximately what duration?",
+                    "Options": [
+                        "A. 30 seconds to 1 minute.",
+                        "B. 2 to 2.5 minutes.",
+                        "C. 5 to 6 minutes.",
+                        "D. Over 10 minutes."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "Why do you want to work here?",
+            "Link": "https://www.youtube.com/watch?v=x-4MewJpaso",
+            "Description": "How to answer the why do you want to work here question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what are the three key things interviewers are looking for when they ask, \"Why do you wanna work here?\"",
+                    "Options": [
+                        "A. Your salary expectations, commuting time, and past work experience.",
+                        "B. Your growth mindset, how much research you've done, and your enthusiasm for the role.",
+                        "C. Your education, your hobbies, and your long-term career goals.",
+                        "D. Your ability to work on a team, your problem-solving skills, and your unique qualifications."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is a key strategy recommended in the video for researching the role?",
+                    "Options": [
+                        "A. Memorizing the company's mission statement.",
+                        "B. Reading news articles about the company's recent achievements.",
+                        "C. Connecting with someone already in the position to ask about their KPIs.",
+                        "D. Looking at the company's social media pages."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "Why does the video suggest focusing on a \"growth mindset\" in your answer?",
+                    "Options": [
+                        "A. To show that you are only interested in a promotion.",
+                        "B. To demonstrate that you are a better candidate than others.",
+                        "C. To convey a desire for new challenges and personal\/professional growth.",  
+                        "D. To indicate that you are willing to take a lower salary."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "The video advises against mentioning which of the following when answering this question?",
+                    "Options": [
+                        "A. Your enthusiasm for the company's products.",
+                        "B. Your desire to solve specific problems.",
+                        "C. Your salary requirements and location preferences.",
+                        "D. Your alignment with the company's values."
+                    ],  
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is one of the ways the video suggests you can show enthusiasm for the role?",
+                    "Options": [
+                        "A. By being an expert in all the required skills before the interview.",
+                        "B. By practicing in front of a mirror, smiling, and nodding.",
+                        "C. By asking the interviewer about their own career path.",
+                        "D. By focusing solely on the high-level mission of the company."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        },
+        {
+            "Title": "Why Are You Leaving Your Current Job?",
+            "Link": "https://www.youtube.com/watch?v=QSPGdAvnUv4",
+            "Description": "How to answer the why are you leaving your current job question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what are the three parts of the ETP method for answering \"Why are you leaving your current job?\"",
+                    "Options": [
+                        "A. Education, Training, and Pay",
+                        "B. Experience, Teamwork, and Potential",
+                        "C. Explain, Transition, and Potential",
+                        "D. Excitement, Thoroughness, and Performance"
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What does the \"Explain\" part of the ETP method involve?",
+                    "Options": [
+                        "A. A detailed, negative explanation of your current job's shortcomings.",
+                        "B. A brief and positive reason for leaving, without speaking negatively about your current employer.",
+                        "C. A long, comprehensive list of all your past job duties and responsibilities.",
+                        "D. A focus on your desire for higher pay and better benefits."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests that the \"Transition\" part of your answer should do what?",
+                    "Options": [
+                        "A. Directly compare your current salary to the new one.",
+                        "B. Connect your reason for leaving to the new role with a concrete example.",
+                        "C. Explain how you plan to change the new company's culture.",
+                        "D. Provide a list of all the companies you've applied to."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the purpose of the \"Potential\" part of the ETP method?",
+                    "Options": [
+                        "A. To discuss your potential for getting a promotion.",
+                        "B. To show your excitement and potential for the new role, based on your research.",
+                        "C. To express your interest in the company's stock options.",
+                        "D. To list all the skills you've learned in your career so far."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What did the video caution against when structuring your answer?",
+                    "Options": [
+                        "A. Smiling and making eye contact with the interviewer.",
+                        "B. Providing specific examples from your past work.",
+                        "C. Speaking negatively about your current or former employer.",
+                        "D. Showing enthusiasm for the new role."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "What are your strengths?",
+            "Link": "https://www.youtube.com/watch?v=jSjOO0ekQ20",
+            "Description": "How to answer the what are your strengths question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what kind of skills should you focus on instead of hard or technical skills?",
+                    "Options": [
+                        "A. Hobbies and interests.",
+                        "B. Transferable skills.",
+                        "C. Company-specific skills.",
+                        "D. Outdated skills."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is one of the three mistakes the video says to avoid when answering the question about your greatest strengths?",
+                    "Options": [
+                        "A. Mentioning a strength that is directly relevant to the job.",
+                        "B. Using the STAR method to structure your answer.",
+                        "C. Relying only on the CARL method.",
+                        "D. Talking about a strength that is irrelevant to the job."
+                    ],
+                    "Answer": "D"
+                },
+                {
+                    "Question": "The video recommends which of the following to understand what qualities a company values?",
+                    "Options": [
+                        "A. Reading the company's annual report.",
+                        "B. Networking with current employees to find out what attributes stand out in high-performers.",
+                        "C. Memorizing the company's mission statement.",
+                        "D. Researching the company's financial performance."   
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the main difference between the STAR method and the CARL method as described in the video?",
+                    "Options": [
+                        "A. The CARL method is for entry-level positions only.",
+                        "B. The CARL method focuses on the \"what\" and not the \"how.\"",
+                        "C. The CARL method includes a \"Learnings\" section to emphasize what was gained from the experience.",
+                        "D. The STAR method is an older, more outdated approach."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the purpose of the \"Learnings\" section in the CARL method?",
+                    "Options": [
+                        "A. To list all the certifications you have.",
+                        "B. To show that you are an expert in all skills.",
+                        "C. To demonstrate your ability to grow and learn from an experience.",
+                        "D. To briefly summarize your entire career history."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "What are your weaknesses?",
+            "Link": "https://www.youtube.com/watch?v=6ehslpTtlEo",
+            "Description": "How to answer the what are your weaknesses question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, which of the following is an example of a \"deal breaker\" weakness you should avoid mentioning?",
+                    "Options": [
+                        "A. Lack of strategic thinking.",
+                        "B. Fear of public speaking.",
+                        "C. Not being a people person.",
+                        "D. Difficulty with time management."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is a key strategy for choosing a weakness to discuss?",
+                    "Options": [
+                        "A. Picking a weakness that is irrelevant to the job.",
+                        "B. Highlighting a skill expected of someone more senior than the role you're applying for.",
+                        "C. Choosing a weakness that you have not made any effort to improve.",
+                        "D. Mentioning a weakness that is a core competency for the job."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests using which of the following formats to provide a concrete example of how you're addressing your weakness?",
+                    "Options": [
+                        "A. STAR (Situation, Task, Action, Result)",
+                        "B. CARL (Context, Action, Results, Learning)",
+                        "C. PQR (Problem, Question, Resolution)",
+                        "D. SMART (Specific, Measurable, Achievable, Relevant, Time-bound)"
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the purpose of giving a concrete example when discussing your weakness?",
+                    "Options": [
+                        "A. To show that the weakness is not a big deal.",
+                        "B. To demonstrate self-awareness and what steps you're taking to improve.",
+                        "C. To prove that you no longer have that weakness.",
+                        "D. To divert the interviewer's attention to a different topic."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What should you avoid when giving your answer, according to the video?",
+                    "Options": [
+                        "A. Discussing a weakness related to a more senior role.",
+                        "B. Using a structured format to tell your story.",
+                        "C. Choosing a weakness that shows a lack of a basic competency.",
+                        "D. Showing self-awareness and a plan for improvement."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "Carrer goals - What do you see yourself in next 5 years?",
+            "Link": "https://www.youtube.com/watch?v=ClmHniKlt6k",
+            "Description": "How to answer the carrer goals - what do you see yourself in next 5 years question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the main problem with the question \"Where do you see yourself in five years?\"?",
+                    "Options": [
+                        "A. It's a trick question designed to test your honesty.",
+                        "B. It encourages candidates to focus on a job title rather than a career path.",
+                        "C. It is a question that is rarely asked in modern interviews.",
+                        "D. It is an inappropriate question to ask a candidate."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What does the interviewer actually want to determine by asking this question?",
+                    "Options": [
+                        "A. If you have a precise, five-year plan for your career.",
+                        "B. If you are a dependable employee who will stay with the company long-term.",
+                        "C. If you are an ambitious person.",
+                        "D. If you are open to relocating."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video's \"specific to broad\" formula breaks the five-year period into two intervals. How should you approach the first interval (Years 1-2)?",
+                    "Options": [
+                        "A. Be broad and focus on your long-term goals.",
+                        "B. Be specific about what you hope to achieve and learn.",
+                        "C. Focus on a potential promotion.",
+                        "D. State your salary expectations for the first two years."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is a key benefit of using the \"specific to broad\" formula?",
+                    "Options": [
+                        "A. It allows you to avoid answering the question directly.",
+                        "B. It demonstrates a proactive attitude and willingness to learn new skills.",
+                        "C. It gives you a chance to discuss your past job titles.",
+                        "D. It lets you express your interest in a different department within the company."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What should your answer about your future self avoid, according to the video?",
+                    "Options": [
+                        "A. Mentioning a desire to learn new skills.",
+                        "B. Discussing your commitment to the company.",
+                        "C. Giving an explicit promise to stay for five years.",
+                        "D. Starting with specific details."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "When you don't know the answer",
+            "Link": "https://www.youtube.com/watch?v=ZqNorUIgIe8&list=PLo-kPya_Ww2wLc0USlqpuN_OAtJjc6qoP&index=12",
+            "Description": "How to answer the when you don't know the answer question",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the first step you should take when faced with a difficult, unprepared interview question?",
+                    "Options": [
+                        "A. Immediately give your best guess to show confidence.",
+                        "B. Stall for time to show you are composed and thoughtful.",
+                        "C. Tell the interviewer you don't know the answer.",
+                        "D. Ask to move on to the next question."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests breaking down a complex question into manageable segments. What principle does the host mention for dividing a group of 10 random people?",
+                    "Options": [
+                        "A. The SWOT analysis principle.",
+                        "B. The 5 Whys principle.",
+                        "C. The MECE principle (Mutually Exclusive, Collectively Exhaustive).",
+                        "D. The Pareto principle (80/20 rule)."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "Which of the following is NOT one of the stalling tactics mentioned in the video?",
+                    "Options": [
+                        "A. Asking clarifying questions.",
+                        "B. Rephrasing and repeating the question back to the interviewer.",
+                        "C. Asking to take the question home to think about it.",
+                        "D. Asking for a minute or two to structure your thoughts on paper."
+                    ],
+                    "Answer": "C"
+                },
+
+                {
+                    "Question": "What does the video emphasize is the most important takeaway from the example answer?",
+                    "Options": [
+                        "A. The specific \"correct\" answer itself.",
+                        "B. The final solution is what matters most.",
+                        "C. The logic and process used to arrive at a well-thought-out answer.",
+                        "D. The ability to guess the interviewer's intended answer."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the final step in the three-step process?",
+                    "Options": [
+                        "A. Breaking down the question into manageable segments.",
+                        "B. Answering the question by addressing each segment.",
+                        "C. Literally asking for time to think.",
+                        "D. Asking for the \"correct\" answer."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        }
+        ]
+    },
+    {
+        "Name": "Behavioral Questions",
+        "Videos": [
+        {
+            "Title": "Behavioral Basic",
+            "Link": "https://www.youtube.com/watch?v=IV30jAw7dxA",
+            "Description": "How to answer behavioral interview technique",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the main purpose of behavioral interview questions?",
+                    "Options": [
+                        "A. To test your knowledge of specific technical skills.",
+                        "B. To ask about hypothetical situations and how you would handle them.",
+                        "C. To have you provide a story about a past experience to demonstrate your skills.",
+                        "D. To see how quickly you can answer a series of rapid-fire questions."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is the \"story toolbox\" strategy, as described in the video?",
+                    "Options": [
+                        "A. A physical box where you keep notes from previous interviews.",
+                        "B. A collection of notable career moments or stories to draw from during an interview.",
+                        "C. A list of all your professional references.",
+                        "D. A set of pre-written answers for every possible interview question."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests that the PAR method is a concise alternative to which other well-known interview method?",
+                    "Options": [
+                        "A. The STAR method.",
+                        "B. The SWOT analysis.",
+                        "C. The CARL method.",
+                        "D. The SMART goals method."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "What do the letters in the PAR method stand for?",
+                    "Options": [
+                        "A. Plan, Act, Review.",
+                        "B. Problem, Action, Result.",
+                        "C. Purpose, Attitude, Response.",
+                        "D. Prepare, Analyze, Reflect."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the final step in the PAR method, and what does it involve?",
+                    "Options": [
+                        "A. Problem: Stating the issue you faced.",
+                        "B. Action: Describing the steps you took.",
+                        "C. Result: Explaining the outcome of your actions.",
+                        "D. Prepare: Researching the company and role beforehand."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "Top 5 Common",
+            "Link": "https://www.youtube.com/watch?v=LYLxtMk9AEU",
+            "Description": "how to answer behavioral questions during an interview, complete with example responses",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the main purpose of the question \"Describe a situation where you went above and beyond\"?",
+                    "Options": [
+                        "A. To see if you can work well with others.",
+                        "B. To check if you are a detail-oriented person.",
+                        "C. To determine if you are proactive and add value beyond your job description.",
+                        "D. To find out if you are willing to work overtime without extra pay."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "When asked to give an example of a time you had to meet a tight deadline, what is the interviewer trying to assess?",
+                    "Options": [
+                        "A. Your ability to handle pressure and deliver quality work in a fast-paced environment.",
+                        "B. Your preference for working on long-term projects.",
+                        "C. Your ability to delegate tasks to other team members.",
+                        "D. Your willingness to miss deadlines if the quality of work would be compromised."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "The video suggests using which of the following formulas to structure your answers to behavioral questions?",
+                    "Options": [
+                        "A. STAR (Situation, Task, Action, Result)",
+                        "B. CARL (Context, Action, Results, Learning)",
+                        "C. PAR (Problem, Action, Result)",
+                        "D. SWOT (Strengths, Weaknesses, Opportunities, Threats)"
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is a key piece of advice given for answering the question \"Tell me about a time you failed\"?",
+                    "Options": [
+                        "A. Focus on how you reacted to the failure, rectified the situation, and what you learned.",
+                        "B. Downplay the failure and quickly move on to a success story.",
+                        "C. Blame the failure on external factors or a coworker.",
+                        "D. Choose a failure that has no relevance to the job you are applying for."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "Why does the host suggest using your \"goal you set and how you achieved it\" story in every interview?",
+                    "Options": [
+                        "A. It's an easy question to answer with little preparation.",
+                        "B. It's a way to demonstrate a relevant and impressive accomplishment.",
+                        "C. It shows that you are a highly ambitious person.",
+                        "D. It is an effective way to show your commitment to the company's mission."
+                    ],
+                    "Answer": "B"
+                }
+            ]
+        }
+        ]
+    },
+    {
+        "Name": "Advanced Strategies",
+        "Videos": [
+        {
+            "Title": "Salary & Offer Negotiation",
+            "Link": "https://www.youtube.com/watch?v=J30wmYgzVXM",
+            "Description": "how to negotiate salary and offer",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is one of the practical consequences of not negotiating your salary?",
+                    "Options": [
+                        "A. You might get a reputation for being difficult to work with.",
+                        "B. You may miss out on significant long-term financial gain.",
+                        "C. The employer may rescind the job offer.",
+                        "D. You will have to accept a different job at a lower salary."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests that people often fail to negotiate salary due to what reason?",
+                    "Options": [
+                        "A. They are too confident in their initial offer.",
+                        "B. They are worried about the company's financial status.",
+                        "C. They are afraid of losing the job offer.",
+                        "D. They do not believe their skills are valuable enough to warrant a higher salary."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What is one of the five tips provided in the video for negotiating salary?",
+                    "Options": [
+                        "A. Accept the first offer to show you are easy to work with.",
+                        "B. Always have a specific number in mind for your desired salary.",
+                        "C. Ask the employer to state their highest possible offer first.",
+                        "D. Focus on the total compensation package, not just the base salary."
+                    ],
+                    "Answer": "D"
+                },
+                {
+                    "Question": "When should you begin the salary negotiation process, according to the video?",
+                    "Options": [
+                        "A. Before the first interview.",
+                        "B. After you have received a formal job offer.",
+                        "C. During the first phone screening.",
+                        "D. At the end of the final interview."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is a key mental barrier to negotiating, as mentioned in the video?",
+                    "Options": [
+                        "A. A lack of confidence in your worth.",
+                        "B. The feeling that you are being greedy.",
+                        "C. The assumption that the offer is non-negotiable.",
+                        "D. All of the above."
+                    ],
+                    "Answer": "D"
+                }
+            ]
+        },
+        {
+            "Title": "Virtual Interview Excellence",
+            "Link": "https://www.youtube.com/watch?v=YPH9PONqDbo",
+            "Description": "how to ace a virtual interview",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is the \"Power of Similarity\" tip?",
+                    "Options": [
+                        "A. Researching your interviewers to find one or two things you can connect on.",
+                        "B. Practicing your interview responses with a family member or friend.",
+                        "C. Making sure your background looks similar to the interviewer's.",
+                        "D. Only applying to jobs at companies with a similar mission to your current one."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "What is the \"Power of Recency\" principle, as described in the video?",
+                    "Options": [
+                        "A. People remember what they hear or see last.",
+                        "B. You should always have the most up-to-date resume.",
+                        "C. Your most recent job experience is the most important.",
+                        "D. You should start your interview by talking about a recent success."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "According to the video, what is considered the \"golden hour\" for scheduling a job interview?",
+                    "Options": [
+                        "A. 3:00 p.m.",
+                        "B. 10:00 a.m.",
+                        "C. 8:00 a.m.",
+                        "D. 2:00 p.m."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests that you should prepare for an interview a few days in advance rather than cramming the night before due to the importance of what?",
+                    "Options": [
+                        "A. The power of primacy.",
+                        "B. The power of timing.",
+                        "C. The power of rest.",
+                        "D. The power of similarity."
+                    ],
+                    "Answer": "C"
+                },
+                {
+                    "Question": "What does the video recommend you do to make a strong first impression, based on the \"Power of Primacy\"?",
+                    "Options": [
+                        "A. Provide a well-refined answer to \"Tell me about yourself\" with energy and positivity.",
+                        "B. Ask a question to the interviewer as soon as the interview begins.",
+                        "C. Send a thank you note before the interview has even started.",
+                        "D. Tell a joke to make the interviewer laugh."
+                    ],
+                    "Answer": "A"
+                }
+
+            ]
+        },
+        {
+            "Title": "Phone Interview",
+            "Link": "https://www.youtube.com/watch?v=BMpm--LPlQw&list=PLnHpoGzKoRE6FevmjwSC6sYpTj3EuugVr&index=21",
+            "Description": "how to ace a phone interview",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is a key way to show confidence during a phone interview?",
+                    "Options": [
+                        "A. Speaking very quickly to show you are knowledgeable.",
+                        "B. Pausing briefly before answering a question to avoid rambling.",
+                        "C. Sounding overly excited and energetic at all times.",
+                        "D. Only answering questions with \"yes\" or \"no\" to be concise."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is a helpful tip mentioned in the video for improving your clarity and conciseness?",
+                    "Options": [
+                        "A. Practicing your answers in front of a mirror.",
+                        "B. Recording your voice while practicing your answers to see if they are engaging.",
+                        "C. Having your resume in front of you during the interview.",
+                        "D. Sending your answers to a friend for feedback."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "The video suggests that you should be able to get your main point across within the first how many seconds of your answer?",
+                    "Options": [
+                        "A. 30 seconds",
+                        "B. 10 seconds",
+                        "C. 1 minute",
+                        "D. 5 seconds"
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "To demonstrate your technical fit for the job, what does the video recommend you do?",
+                    "Options": [
+                        "A. Mention the salary you expect.",
+                        "B. Identify keywords from the job description and incorporate them into your answers.",
+                        "C. Talk about your hobbies and interests.",
+                        "D. Ask the interviewer a lot of technical questions."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is the purpose of the initial phone screen for a recruiter or hiring manager?",
+                    "Options": [
+                        "A. To see if you can work well on a team.",
+                        "B. To ask you to complete a technical task.",
+                        "C. To assess your resume in more detail while talking to you.",
+                        "D. To find out about your long-term career goals."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        },
+        {
+            "Title": "Thank you Interview letter",
+            "Link": "https://www.youtube.com/watch?v=gSbV3q_MMbg&list=PLo-kPya_Ww2wLc0USlqpuN_OAtJjc6qoP&index=16",
+            "Description": "how to write a thank you interview letter",
+            "MCQs": [
+                {
+                    "Question": "According to the video, what is a key piece of information you can ask an interviewer to remember a specific detail for your thank-you note?",
+                    "Options": [
+                        "A. \"What are your weekend plans?\"",
+                        "B. \"What do you like about working here?\"",
+                        "C. \"What is the biggest challenge of this role?\"",
+                        "D. \"When do you plan on making a hiring decision?\""
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "If you don't get the interviewer's email address, what is one of the methods the video suggests for obtaining it?",
+                    "Options": [
+                        "A. Search for their name on a social media site.",
+                        "B. Use a free email finder tool like Mailscoop or Hunter.io.",
+                        "C. Call the company's main number and ask for it.",
+                        "D. Wait for them to email you first."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "How long after an interview should you send a thank-you email, according to the video?",
+                    "Options": [
+                        "A. Within 24 hours.",
+                        "B. Within 3-5 business days.",
+                        "C. At least a week later.",
+                        "D. The same day, within an hour."
+                    ],
+                    "Answer": "A"
+                },
+                {
+                    "Question": "What does the video suggest is a good limit for sending follow-up emails if you haven't heard back?",
+                    "Options": [
+                        "A. One follow-up email.",
+                        "B. Up to three follow-up emails, one week apart.",
+                        "C. You should not send any follow-up emails.",
+                        "D. As many as it takes to get a response."
+                    ],
+                    "Answer": "B"
+                },
+                {
+                    "Question": "What is a \"pro-tip\" mentioned in the video for sending follow-up emails?",
+                    "Options": [
+                        "A. Start a new email thread each time.",
+                        "B. Always keep the tone formal and serious.",
+                        "C. Use the same email thread and mention a different detail each time.",
+                        "D. Send the follow-ups to a different person each time."
+                    ],
+                    "Answer": "C"
+                }
+            ]
+        }
+        ]
+    }
+    ],
+"Playbooks": [
+    {
+        "Name": "Before Interview",
+        "Articles": [
+            {
+                "Title": "What Is the Purpose of a Job Interview? (Plus Tips for Success)",
+                "Link": "https://www.indeed.com/career-advice/interviewing/purpose-of-an-interview",
+                "Description": "what is the purpose of a job interview"
+            },
+            {
+                "Title": "6 Ways To Mentally Prepare for Your Next Interview",
+                "Link": "https://www.indeed.com/career-advice/interviewing/mentally-prepare-for-interview",
+                "Description": "how to mentally prepare for an interview"
+            },
+            {
+                "Title": "How To Prepare for an Interview in 11 Steps", 
+                "Link": "https://www.indeed.com/career-advice/interviewing/how-to-prepare-for-an-interview",
+                "Description": "how to prepare for an interview"
+            },
+            {
+                "Title": "5 Questions To Ask Yourself Before a Job Interview",
+                "Link": "https://www.indeed.com/career-advice/interviewing/questions-to-ask-yourself-before-a-job-interview",
+                "Description": "questions to ask yourself before a job interview"
+            },
+            {
+                "Title": "Positive Affirmations in the Workplace: Impact, Tips and Examples",
+                "Link": "https://www.indeed.com/career-advice/career-development/positive-affirmations",
+                "Description": "positive affirmations in the workplace"
+            },
+            {
+                "Title": "15 Ways To Calm Pre-Interview Nerves",
+                "Link": "https://www.indeed.com/career-advice/interviewing/pre-interview-nerves",
+                "Description": "how to calm pre-interview nerves"
+            },
+            {
+                "Title": "Last-Minute Interview Tips",
+                "Link": "https://www.indeed.com/career-advice/interviewing/last-minute-interview-tips",
+                "Description": "last-minute interview tips"
+            }
+        ]
+    },
+    {
+        "Name": "During Interview",
+        "Articles": [
+            {
+                "Title": "How To Make a Great Impression in a Job Interview",
+                "Link": "https://www.indeed.com/career-advice/interviewing/job-interview-tips-how-to-make-a-great-impression",
+                "Description": "how to make a great impression in a job interview"
+            },
+            {
+                "Title": "Interview Types and Techniques To Ace Your Job Interview",
+                "Link": "https://www.indeed.com/career-advice/interviewing/interview-techniques",
+                "Description": "interview types and techniques to ace your job interview"
+            },
+            {
+                "Title": "7 Time Management Interview Questions",
+                "Link": "https://www.indeed.com/career-advice/interviewing/time-management-interview-questions",
+                "Description": "time management interview questions"
+            },
+            {
+                "Title": "Closing an Interview: Important Steps to Help You Get the Job",
+                "Link": "https://www.indeed.com/career-advice/interviewing/how-to-close-an-interview",
+                "Description": "how to close an interview"
+            }
+        ]
+    },
+    {
+        "Name": "After Interview",
+        "Articles": [
+            {
+                "Title": "What To Do After an Interview: 9 Tips to Help You Succeed",
+                "Link": "https://www.indeed.com/career-advice/interviewing/what-to-do-after-an-interview",
+                "Description": "what to do after an interview"
+            },
+            {
+                "Title": "Follow-Up Email After an Interview (Examples and Template)",
+                "Link": "https://www.indeed.com/career-advice/interviewing/follow-up-email-examples-after-interview",
+                "Description": "follow-up email after an interview"
+            }
+        ]
+    }
+]
+}

@@ -8,9 +8,38 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionName, questionSetId } = await request.json()
+    const { sessionName, questionSetId, questions } = await request.json()
     
-    // Get the question set
+    // Handle practice sessions without requiring database question set
+    if (questionSetId === 'practice-session' && questions) {
+      // Create interview session for practice
+      const { data: session, error: sessionError } = await supabase
+        .from('interview_sessions')
+        .insert({
+          user_id: 'demo-user', // For MVP, using demo user
+          session_name: sessionName,
+          question_set_id: null, // No question set for practice
+          total_questions: questions.length,
+          completed_questions: 0
+        })
+        .select()
+        .single()
+
+      if (sessionError) {
+        console.error('Session creation error:', sessionError)
+        return NextResponse.json(
+          { error: 'Failed to create session' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        session,
+        questions: questions
+      })
+    }
+    
+    // Get the question set for regular sessions
     const { data: questionSet, error: questionSetError } = await supabase
       .from('question_sets')
       .select('*')

@@ -1,17 +1,181 @@
 "use client"
 
-import { useState } from "react"
-import { Globe, Building2, Target, GraduationCap, ChevronDown, ChevronUp } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { Globe, Building2, Target, GraduationCap, ChevronDown, ChevronUp, Users, BookOpen, Heart, Zap } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
+
+interface QuestionSetData {
+  [key: string]: {
+    [key: string]: string[] | {
+      [key: string]: string[] | {
+        [key: string]: string[]
+      }
+    }
+  }
+}
 
 export function QuestionSets() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [expandedCards, setExpandedCards] = useState<number[]>([])
+  const [expandedSubCategories, setExpandedSubCategories] = useState<Set<string>>(new Set())
+  const [questionData, setQuestionData] = useState<QuestionSetData>({})
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadQuestionData = async () => {
+      try {
+        const response = await fetch('/api/interview/question-sets-data')
+        if (response.ok) {
+          const data = await response.json()
+          setQuestionData(data)
+        }
+      } catch (error) {
+        console.error('Failed to load question data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadQuestionData()
+  }, [])
 
   const toggleCard = (cardId: number) => {
     setExpandedCards((prev) => (prev.includes(cardId) ? prev.filter((id) => id !== cardId) : [...prev, cardId]))
+  }
+
+  const toggleSubCategory = (categoryKey: string, subCategory: string) => {
+    const key = `${categoryKey}-${subCategory}`
+    setExpandedSubCategories((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(key)) {
+        newSet.delete(key)
+      } else {
+        newSet.add(key)
+      }
+      return newSet
+    })
+  }
+
+  const isSubCategoryExpanded = (categoryKey: string, subCategory: string) => {
+    return expandedSubCategories.has(`${categoryKey}-${subCategory}`)
+  }
+
+  const getIconForCategory = (category: string) => {
+    switch (category) {
+      case "General":
+        return Globe
+      case "By College (VinUni)":
+        return GraduationCap
+      case "By Competency":
+        return Target
+      default:
+        return Building2
+    }
+  }
+
+  const getSubCategories = (category: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData) return []
+    
+    return Object.keys(categoryData)
+  }
+
+  const getSubSubCategories = (category: string, subCategory: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData || !categoryData[subCategory]) return []
+    
+    const subCategoryData = categoryData[subCategory]
+    if (Array.isArray(subCategoryData)) return []
+    
+    return Object.keys(subCategoryData)
+  }
+
+  const getSubSubSubCategories = (category: string, subCategory: string, subSubCategory: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData || !categoryData[subCategory]) return []
+    
+    const subCategoryData = categoryData[subCategory]
+    if (Array.isArray(subCategoryData) || !subCategoryData[subSubCategory]) return []
+    
+    const subSubCategoryData = subCategoryData[subSubCategory]
+    if (Array.isArray(subSubCategoryData)) return []
+    
+    return Object.keys(subSubCategoryData)
+  }
+
+  const getQuestionCount = (category: string, subCategory?: string, subSubCategory?: string, subSubSubCategory?: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData) return 0
+    
+    if (!subCategory) {
+      // Count all questions in category
+      let total = 0
+      Object.values(categoryData).forEach(subCat => {
+        if (Array.isArray(subCat)) {
+          total += subCat.length
+        } else {
+          Object.values(subCat).forEach(subSubCat => {
+            if (Array.isArray(subSubCat)) {
+              total += subSubCat.length
+            } else {
+              Object.values(subSubCat).forEach(questions => {
+                if (Array.isArray(questions)) {
+                  total += questions.length
+                }
+              })
+            }
+          })
+        }
+      })
+      return total
+    }
+    
+    const subCategoryData = categoryData[subCategory]
+    if (!subCategoryData) return 0
+    
+    if (Array.isArray(subCategoryData)) {
+      return subCategoryData.length
+    }
+    
+    if (!subSubCategory) {
+      // Count all questions in subcategory
+      let total = 0
+      Object.values(subCategoryData).forEach(subSubCat => {
+        if (Array.isArray(subSubCat)) {
+          total += subSubCat.length
+        } else {
+          Object.values(subSubCat).forEach(questions => {
+            if (Array.isArray(questions)) {
+              total += questions.length
+            }
+          })
+        }
+      })
+      return total
+    }
+    
+    const subSubCategoryData = subCategoryData[subSubCategory]
+    if (!subSubCategoryData) return 0
+    
+    if (Array.isArray(subSubCategoryData)) {
+      return subSubCategoryData.length
+    }
+    
+    if (!subSubSubCategory) {
+      // Count all questions in subsubcategory
+      let total = 0
+      Object.values(subSubCategoryData).forEach(questions => {
+        if (Array.isArray(questions)) {
+          total += questions.length
+        }
+      })
+      return total
+    }
+    
+    const questions = subSubCategoryData[subSubSubCategory]
+    return Array.isArray(questions) ? questions.length : 0
   }
 
   const questionSets = [
@@ -20,72 +184,42 @@ export function QuestionSets() {
       title: "General",
       description: "Covers 80% of the interview questions you might get.",
       icon: Globe,
-      subCategories: [
-        "Career Change",
-        "Elevator Pitch",
-        "Entry Level",
-        "Internship",
-        "Managerial Role",
-        "Mid Level",
-        "Senior Level",
-        "Top 10 Questions",
-        "Uncomfortable Questions",
-      ],
+      category: "General"
     },
     {
       id: 2,
-      title: "By Industry",
-      description: "Start practicing mock interviews in hundreds of industries and job titles.",
-      icon: Building2,
-      subCategories: [
-        "Technology & Software",
-        "Healthcare & Medical",
-        "Finance & Banking",
-        "Marketing & Advertising",
-        "Consulting",
-        "Education",
-        "Retail & E-commerce",
-        "Manufacturing",
-        "Non-Profit",
-      ],
+      title: "By College (VinUni)",
+      description: "Questions organized by college and specific programs.",
+      icon: GraduationCap,
+      category: "By College (VinUni)"
     },
     {
       id: 3,
       title: "By Competency",
       description: "Questions sorted by competency & skillset.",
       icon: Target,
-      subCategories: [
-        "Leadership & Management",
-        "Problem Solving",
-        "Communication Skills",
-        "Teamwork & Collaboration",
-        "Analytical Thinking",
-        "Customer Service",
-        "Project Management",
-        "Technical Skills",
-        "Adaptability",
-      ],
+      category: "By Competency"
     },
     {
       id: 4,
-      title: "Admissions Interview",
+      title: "Admission Interview",
       description: "Interview questions by program type and school.",
       icon: GraduationCap,
-      subCategories: [
-        "MBA Programs",
-        "Medical School",
-        "Law School",
-        "Graduate Programs",
-        "Undergraduate",
-        "PhD Programs",
-        "Business School",
-        "Engineering Programs",
-        "International Programs",
-      ],
-    },
+      category: "Admission Interview"
+    }
   ]
 
   const isExpanded = (cardId: number) => expandedCards.includes(cardId)
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-500">Loading question sets...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -97,77 +231,119 @@ export function QuestionSets() {
 
       {/* Question Sets List */}
       <div className="space-y-4">
-        {questionSets.map((set) => (
-          <div
-            key={set.id}
-            className="bg-white rounded-xl border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all overflow-hidden"
-          >
-            {/* Main Card Header */}
-            <div className="p-6 cursor-pointer" onClick={() => toggleCard(set.id)}>
-              <div className="flex items-start gap-4">
-                {/* Icon */}
-                <div className="flex-shrink-0 p-3 bg-blue-50 rounded-full">
-                  <set.icon className="h-6 w-6 text-blue-600" />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{set.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{set.description}</p>
-                </div>
-
-                {/* Expand/Collapse Icon */}
-                <div className="flex-shrink-0">
-                  <div className="p-2">
+        {questionSets.map((set) => {
+          const IconComponent = getIconForCategory(set.category)
+          const subCategories = getSubCategories(set.category)
+          const totalQuestions = getQuestionCount(set.category)
+          
+          return (
+            <div key={set.id} className="bg-white rounded-lg shadow-md border border-gray-200">
+              <div 
+                className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => toggleCard(set.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <IconComponent className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900">{set.title}</h3>
+                      <p className="text-gray-600 mt-1">{set.description}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <span className="text-sm text-gray-500">{subCategories.length} categories</span>
+                        <span className="text-sm text-gray-500">{totalQuestions} questions</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     {isExpanded(set.id) ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="w-5 h-5 text-gray-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
                     )}
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Expandable Content */}
-            {isExpanded(set.id) && (
-              <div className="px-6 pb-6">
-                <div className="ml-14">
-                  {/* Sub-categories */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3 uppercase tracking-wide">Sub-Categories</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {set.subCategories.map((subCategory, index) => (
-                        <div
-                          key={index}
-                          className="px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors cursor-pointer"
-                        >
-                          {subCategory}
+              {isExpanded(set.id) && (
+                <div className="px-6 pb-6 border-t border-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {subCategories.map((subCategory) => {
+                      const subSubCategories = getSubSubCategories(set.category, subCategory)
+                      const subCategoryQuestionCount = getQuestionCount(set.category, subCategory)
+                      const isSubExpanded = isSubCategoryExpanded(set.category, subCategory)
+                      
+                      return (
+                        <div key={subCategory} className="bg-gray-50 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium text-gray-900">{subCategory}</h4>
+                            {subSubCategories.length > 0 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  toggleSubCategory(set.category, subCategory)
+                                }}
+                                className="p-1 hover:bg-gray-200 rounded"
+                              >
+                                {isSubExpanded ? (
+                                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3">{subCategoryQuestionCount} questions</p>
+                          
+                          {isSubExpanded && subSubCategories.length > 0 && (
+                            <div className="space-y-2 mb-3">
+                              {subSubCategories.map((subSubCategory) => {
+                                const subSubSubCategories = getSubSubSubCategories(set.category, subCategory, subSubCategory)
+                                const subSubCategoryQuestionCount = getQuestionCount(set.category, subCategory, subSubCategory)
+                                
+                                return (
+                                  <div key={subSubCategory} className="ml-4">
+                                    <h5 className="text-sm font-medium text-gray-800 mb-1">{subSubCategory}</h5>
+                                    <p className="text-xs text-gray-600 mb-2">{subSubCategoryQuestionCount} questions</p>
+                                    
+                                    {subSubSubCategories.length > 0 && (
+                                      <div className="ml-4 space-y-1">
+                                        {subSubSubCategories.map((subSubSubCategory) => {
+                                          const questionCount = getQuestionCount(set.category, subCategory, subSubCategory, subSubSubCategory)
+                                          
+                                          return (
+                                            <div key={subSubSubCategory} className="flex items-center justify-between">
+                                              <span className="text-xs text-gray-700">{subSubSubCategory}</span>
+                                              <span className="text-xs text-gray-500">{questionCount} questions</span>
+                                            </div>
+                                          )
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+                          
+                          <Button
+                            size="sm"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                            onClick={() => router.push(`/ai-interview?tab=practice&category=${set.category}`)}
+                          >
+                            Practice
+                          </Button>
                         </div>
-                      ))}
-                    </div>
+                      )
+                    })}
                   </div>
-
-                  {/* CTA Button */}
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                    onClick={() => {
-                      const current = new URLSearchParams(Array.from(searchParams.entries()))
-                      current.set("tab", "practice")
-                      router.push(`?${current.toString()}`)
-                    }}
-                  >
-                    ➤ Practice with These Questions
-                  </Button>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          )
+        })}
       </div>
-
-      {/* Bottom spacing */}
-      <div className="mt-12"></div>
     </div>
   )
 }

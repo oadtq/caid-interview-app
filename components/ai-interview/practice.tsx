@@ -4,37 +4,42 @@ import { useEffect, useRef, useState } from "react"
 import { Card3D } from "@/components/card-3d"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Video, MessageSquare, Clock, Star, Camera, ArrowLeft, ArrowRight, Mic, Volume2, Globe, Building2, Target, GraduationCap, Check, X, Square, RotateCcw, CameraOff, MicOff, Upload } from 'lucide-react'
+import { Video, MessageSquare, Clock, Star, Camera, ArrowLeft, ArrowRight, Mic, Volume2, Globe, Building2, Target, GraduationCap, Check, X, Square, RotateCcw, CameraOff, MicOff, Upload, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useSearchParams } from "next/navigation"
 
 interface PracticeProps {
   onTabChange?: (tab: string) => void
 }
 
-interface Question {
-  id: string
-  text: string
-  timeLimit: number
+interface QuestionSetData {
+  [key: string]: {
+    [key: string]: string[] | {
+      [key: string]: string[] | {
+        [key: string]: string[]
+      }
+    }
+  }
 }
 
-interface DBQuestionSet {
-  id: string
-  name: string
-  description: string
-  category: string
-  difficulty: string
-  questions: Question[]
-}
-
-export default function Practice({ onTabChange }: PracticeProps) {
-  const [dbQuestionSets, setDbQuestionSets] = useState<DBQuestionSet[]>([])
-  const [loadingSets, setLoadingSets] = useState<boolean>(true)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-
-  const [selectedSetId, setSelectedSetId] = useState<string>("")
+export function Practice({ onTabChange }: PracticeProps) {
+  const searchParams = useSearchParams()
+  const [questionData, setQuestionData] = useState<QuestionSetData>({})
+  const [loading, setLoading] = useState(true)
+  
+  // Navigation states
+  const [currentStep, setCurrentStep] = useState<'category' | 'subcategory' | 'subsubcategory' | 'subsubsubcategory' | 'interview'>('category')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedSubCategory, setSelectedSubCategory] = useState('')
+  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState('')
+  const [selectedSubSubSubCategory, setSelectedSubSubSubCategory] = useState('')
+  
+  // Interview states
   const [isInterviewStarted, setIsInterviewStarted] = useState(false)
-  const [currentSession, setCurrentSession] = useState<any>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [sessionQuestions, setSessionQuestions] = useState<string[]>([])
+  const [currentSession, setCurrentSession] = useState<any>(null)
 
+  // Recording states
   const [cameraEnabled, setCameraEnabled] = useState(true)
   const [micEnabled, setMicEnabled] = useState(true)
   const [stream, setStream] = useState<MediaStream | null>(null)
@@ -52,23 +57,24 @@ export default function Practice({ onTabChange }: PracticeProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Load question data
   useEffect(() => {
-    const fetchSets = async () => {
+    const loadQuestionData = async () => {
       try {
-        setLoadingSets(true)
-        setFetchError(null)
-        const res = await fetch('/api/interview/question-sets')
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const data = await res.json()
-        setDbQuestionSets((data.questionSets || []) as DBQuestionSet[])
-      } catch (e) {
-        setFetchError(e instanceof Error ? e.message : 'Failed to fetch question sets')
-        setDbQuestionSets([])
+        const response = await fetch('/api/interview/question-sets-data')
+        if (response.ok) {
+          const data = await response.json()
+          setQuestionData(data)
+        }
+      } catch (error) {
+        console.error('Failed to load question data:', error)
       } finally {
-        setLoadingSets(false)
+        setLoading(false)
       }
     }
-    fetchSets()
+    
+    loadQuestionData()
+    
     return () => {
       if (stream) {
         stream.getTracks().forEach(t => t.stop())
@@ -77,6 +83,34 @@ export default function Practice({ onTabChange }: PracticeProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const category = searchParams.get('category')
+    const subCategory = searchParams.get('subCategory')
+    const subSubCategory = searchParams.get('subSubCategory')
+    const subSubSubCategory = searchParams.get('subSubSubCategory')
+
+    if (category) {
+      setSelectedCategory(category)
+      if (subCategory) {
+        setSelectedSubCategory(subCategory)
+        if (subSubCategory) {
+          setSelectedSubSubCategory(subSubCategory)
+          if (subSubSubCategory) {
+            setSelectedSubSubSubCategory(subSubSubCategory)
+            setCurrentStep('interview')
+          } else {
+            setCurrentStep('subsubsubcategory')
+          }
+        } else {
+          setCurrentStep('subsubcategory')
+        }
+      } else {
+        setCurrentStep('subcategory')
+      }
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const v = videoRef.current
@@ -118,12 +152,146 @@ export default function Practice({ onTabChange }: PracticeProps) {
     }
   }
 
+  const getCategoryIcon = (category: string) => {
+    const categoryLower = category.toLowerCase()
+    if (categoryLower.includes('general') || categoryLower.includes('common')) return Globe
+    if (categoryLower.includes('industry') || categoryLower.includes('business')) return Building2
+    if (categoryLower.includes('competency') || categoryLower.includes('skill')) return Target
+    if (categoryLower.includes('admission') || categoryLower.includes('education')) return GraduationCap
+    if (categoryLower.includes('technical') || categoryLower.includes('tech')) return Video
+    if (categoryLower.includes('behavioral') || categoryLower.includes('behavior')) return MessageSquare
+    return Globe
+  }
+
+  const getCategories = () => {
+    return Object.keys(questionData)
+  }
+
+  const getSubCategories = (category: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData) return []
+    return Object.keys(categoryData)
+  }
+
+  const getSubSubCategories = (category: string, subCategory: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData || !categoryData[subCategory]) return []
+    
+    const subCategoryData = categoryData[subCategory]
+    if (Array.isArray(subCategoryData)) return []
+    
+    return Object.keys(subCategoryData)
+  }
+
+  const getSubSubSubCategories = (category: string, subCategory: string, subSubCategory: string) => {
+    const categoryData = questionData[category]
+    if (!categoryData || !categoryData[subCategory]) return []
+    
+    const subCategoryData = categoryData[subCategory]
+    if (Array.isArray(subCategoryData) || !subCategoryData[subSubCategory]) return []
+    
+    const subSubCategoryData = subCategoryData[subSubCategory]
+    if (Array.isArray(subSubCategoryData)) return []
+    
+    return Object.keys(subSubCategoryData)
+  }
+
+  const getQuestions = (category: string, subCategory?: string, subSubCategory?: string, subSubSubCategory?: string): string[] => {
+    const categoryData = questionData[category]
+    if (!categoryData) return []
+    
+    if (!subCategory) {
+      // Get all questions from category
+      const allQuestions: string[] = []
+      Object.values(categoryData).forEach(subCat => {
+        if (Array.isArray(subCat)) {
+          allQuestions.push(...subCat)
+        } else {
+          Object.values(subCat).forEach(subSubCat => {
+            if (Array.isArray(subSubCat)) {
+              allQuestions.push(...subSubCat)
+            } else {
+              Object.values(subSubCat).forEach(questions => {
+                if (Array.isArray(questions)) {
+                  allQuestions.push(...questions)
+                }
+              })
+            }
+          })
+        }
+      })
+      return allQuestions
+    }
+    
+    const subCategoryData = categoryData[subCategory]
+    if (!subCategoryData) return []
+    
+    if (Array.isArray(subCategoryData)) {
+      return subCategoryData
+    }
+    
+    if (!subSubCategory) {
+      // Get all questions from subcategory
+      const allQuestions: string[] = []
+      Object.values(subCategoryData).forEach(subSubCat => {
+        if (Array.isArray(subSubCat)) {
+          allQuestions.push(...subSubCat)
+        } else {
+          Object.values(subSubCat).forEach(questions => {
+            if (Array.isArray(questions)) {
+              allQuestions.push(...questions)
+            }
+          })
+        }
+      })
+      return allQuestions
+    }
+    
+    const subSubCategoryData = subCategoryData[subSubCategory]
+    if (!subSubCategoryData) return []
+    
+    if (Array.isArray(subSubCategoryData)) {
+      return subSubCategoryData
+    }
+    
+    if (!subSubSubCategory) {
+      // Get all questions from subsubcategory
+      const allQuestions: string[] = []
+      Object.values(subSubCategoryData).forEach(questions => {
+        if (Array.isArray(questions)) {
+          allQuestions.push(...questions)
+        }
+      })
+      return allQuestions
+    }
+    
+    const questions = subSubCategoryData[subSubSubCategory]
+    return Array.isArray(questions) ? questions : []
+  }
+
+  const selectRandomQuestions = (questions: string[], count: number = 5): string[] => {
+    const shuffled = [...questions].sort(() => 0.5 - Math.random())
+    return shuffled.slice(0, Math.min(count, questions.length))
+  }
+
   const toggleCamera = () => {
     if (!stream) return
     const vt = stream.getVideoTracks()[0]
     if (vt) {
-      vt.enabled = !cameraEnabled
-      setCameraEnabled(!cameraEnabled)
+      if (cameraEnabled) {
+        // Turning camera off
+        vt.enabled = false
+        setCameraEnabled(false)
+      } else {
+        // Turning camera on
+        vt.enabled = true
+        setCameraEnabled(true)
+        // Ensure video element is still connected to stream
+        if (videoRef.current && videoRef.current.srcObject !== stream) {
+          videoRef.current.srcObject = stream
+          videoRef.current.play().catch(() => {})
+        }
+      }
     }
   }
 
@@ -138,6 +306,19 @@ export default function Practice({ onTabChange }: PracticeProps) {
 
   const startRecording = () => {
     if (!stream) return
+
+    // Create cloned tracks for recording to avoid interfering with preview
+    const videoTrack = stream.getVideoTracks()[0]
+    const audioTrack = stream.getAudioTracks()[0]
+    
+    if (!videoTrack || !audioTrack) return
+
+    // Clone tracks for recording
+    const clonedVideoTrack = videoTrack.clone()
+    const clonedAudioTrack = audioTrack.clone()
+    
+    const recordingStream = new MediaStream([clonedVideoTrack, clonedAudioTrack])
+
     const preferredTypes = [
       'video/webm;codecs=vp9',
       'video/webm;codecs=vp8',
@@ -146,19 +327,22 @@ export default function Practice({ onTabChange }: PracticeProps) {
     ]
     const mimeType = preferredTypes.find(t => !t || MediaRecorder.isTypeSupported(t)) || 'video/webm'
     const options = mimeType ? { mimeType } as MediaRecorderOptions : undefined
-    const recorder = new MediaRecorder(stream, options)
+    const recorder = new MediaRecorder(recordingStream, options)
     const chunks: Blob[] = []
     recorder.ondataavailable = (ev) => {
       if (ev.data.size > 0) chunks.push(ev.data)
     }
     recorder.onstop = () => {
       setRecordedChunks(chunks)
+      // Clean up cloned tracks
+      clonedVideoTrack.stop()
+      clonedAudioTrack.stop()
     }
     recorder.start()
     setMediaRecorder(recorder)
 
     // Start parallel audio-only recorder
-    const audioStream = new MediaStream(stream.getAudioTracks())
+    const audioStream = new MediaStream([clonedAudioTrack.clone()])
     const audioMime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', ''].find(t => !t || MediaRecorder.isTypeSupported(t)) || 'audio/webm'
     const audioOptions = audioMime ? { mimeType: audioMime } as MediaRecorderOptions : undefined
     const aRecorder = new MediaRecorder(audioStream, audioOptions)
@@ -168,6 +352,8 @@ export default function Practice({ onTabChange }: PracticeProps) {
     }
     aRecorder.onstop = () => {
       setAudioChunks(aChunks)
+      // Clean up audio stream
+      audioStream.getTracks().forEach(track => track.stop())
     }
     aRecorder.start()
     setAudioRecorder(aRecorder)
@@ -188,21 +374,19 @@ export default function Practice({ onTabChange }: PracticeProps) {
     if (timerRef.current) clearInterval(timerRef.current)
   }
 
-  // No ffmpeg: we record audio in parallel using an audio-only MediaRecorder
-
   const uploadRecording = async () => {
     if (!currentSession || recordedChunks.length === 0) return
     setIsUploading(true)
     setUploadStatus('uploading')
     try {
       const videoBlob = new Blob(recordedChunks, { type: 'video/webm' })
-      const currentQuestion = currentSession.questions[currentQuestionIndex] as Question
+      const currentQuestion = sessionQuestions[currentQuestionIndex]
 
       const formData = new FormData()
       formData.append('video', videoBlob)
       formData.append('sessionId', currentSession.id)
-      formData.append('questionId', currentQuestion.id)
-      formData.append('questionText', currentQuestion.text)
+      formData.append('questionId', `q${currentQuestionIndex}`)
+      formData.append('questionText', currentQuestion)
       formData.append('duration', recordingTime.toString())
 
       const uploadRes = await fetch('/api/interview/upload-video', { method: 'POST', body: formData })
@@ -215,14 +399,14 @@ export default function Practice({ onTabChange }: PracticeProps) {
       const audioForm = new FormData()
       audioForm.append('audio', audioFile)
       audioForm.append('responseId', uploadData.response.id)
-      audioForm.append('questionText', currentQuestion.text)
+      audioForm.append('questionText', currentQuestion)
       const analyzeRes = await fetch('/api/interview/analyze-audio', { method: 'POST', body: audioForm })
       if (!analyzeRes.ok) throw new Error('Analysis failed')
 
       setUploadStatus('complete')
 
       setTimeout(() => {
-        if (currentQuestionIndex < currentSession.questions.length - 1) {
+        if (currentQuestionIndex < sessionQuestions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1)
           resetRecording()
         } else {
@@ -248,24 +432,70 @@ export default function Practice({ onTabChange }: PracticeProps) {
     setIsRecording(false)
   }
 
-  const startSession = async (setId: string) => {
+  const generateUUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0
+      const v = c == 'x' ? r : (r & 0x3 | 0x8)
+      return v.toString(16)
+    })
+  }
+
+  const startSession = async (questions: string[]) => {
     try {
-      setSelectedSetId(setId)
-      const selected = dbQuestionSets.find(s => s.id === setId)
-      const sessionName = `Practice - ${selected?.name || 'Interview'} (${new Date().toLocaleString()})`
+      const sessionName = `Practice - ${selectedCategory} (${new Date().toLocaleString()})`
+      
+      // Try to create a session using the sessions API
+      // We'll use a placeholder questionSetId and handle it on the backend
+      const sessionData = {
+        sessionName,
+        questionSetId: 'practice-session', // Placeholder ID
+        questions: questions.map((q, i) => ({ id: `q${i}`, text: q, timeLimit: 120 }))
+      }
+
       const res = await fetch('/api/interview/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionName, questionSetId: setId })
+        body: JSON.stringify(sessionData)
       })
-      if (!res.ok) throw new Error('Failed to start session')
-      const data = await res.json()
-      setCurrentSession({ ...data.session, questions: data.questions })
-      setCurrentQuestionIndex(0)
-      setIsInterviewStarted(true)
-      await initializeCamera()
+
+      if (res.ok) {
+        // If session creation succeeds, use the real session
+        const data = await res.json()
+        setCurrentSession(data.session)
+        setSessionQuestions(questions)
+        setCurrentQuestionIndex(0)
+        setCurrentStep('interview')
+        setIsInterviewStarted(true)
+        await initializeCamera()
+      } else {
+        // Fallback to mock session if API fails
+        console.log('Session API failed, using mock session')
+        const session = {
+          id: generateUUID(), // Use proper UUID format
+          session_name: sessionName,
+          questions: questions.map((q, i) => ({ id: `q${i}`, text: q }))
+        }
+        setCurrentSession(session)
+        setSessionQuestions(questions)
+        setCurrentQuestionIndex(0)
+        setCurrentStep('interview')
+        setIsInterviewStarted(true)
+        await initializeCamera()
+      }
     } catch (e) {
       console.error('Start session error:', e)
+      // Fallback to mock session
+      const session = {
+        id: generateUUID(),
+        session_name: `Practice - ${selectedCategory} (${new Date().toLocaleString()})`,
+        questions: questions.map((q, i) => ({ id: `q${i}`, text: q }))
+      }
+      setCurrentSession(session)
+      setSessionQuestions(questions)
+      setCurrentQuestionIndex(0)
+      setCurrentStep('interview')
+      setIsInterviewStarted(true)
+      await initializeCamera()
     }
   }
 
@@ -286,7 +516,11 @@ export default function Practice({ onTabChange }: PracticeProps) {
 
   const handleBackToSetup = () => {
     setIsInterviewStarted(false)
-    setSelectedSetId("")
+    setSelectedCategory('')
+    setSelectedSubCategory('')
+    setSelectedSubSubCategory('')
+    setSelectedSubSubSubCategory('')
+    setCurrentStep('category')
     setIsRecording(false)
     setCountdown(0)
     setHasStartedRecording(false)
@@ -298,20 +532,78 @@ export default function Practice({ onTabChange }: PracticeProps) {
     }
   }
 
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category)
+    setCurrentStep('subcategory')
+  }
+
+  const handleSubCategorySelect = (subCategory: string) => {
+    setSelectedSubCategory(subCategory)
+    const subSubCategories = getSubSubCategories(selectedCategory, subCategory)
+    if (subSubCategories.length > 0) {
+      setCurrentStep('subsubcategory')
+    } else {
+      // No further subcategories, start interview
+      const questions = getQuestions(selectedCategory, subCategory)
+      const selectedQuestions = selectRandomQuestions(questions)
+      startSession(selectedQuestions)
+    }
+  }
+
+  const handleSubSubCategorySelect = (subSubCategory: string) => {
+    setSelectedSubSubCategory(subSubCategory)
+    const subSubSubCategories = getSubSubSubCategories(selectedCategory, selectedSubCategory, subSubCategory)
+    if (subSubSubCategories.length > 0) {
+      setCurrentStep('subsubsubcategory')
+    } else {
+      // No further subcategories, start interview
+      const questions = getQuestions(selectedCategory, selectedSubCategory, subSubCategory)
+      const selectedQuestions = selectRandomQuestions(questions)
+      startSession(selectedQuestions)
+    }
+  }
+
+  const handleSubSubSubCategorySelect = (subSubSubCategory: string) => {
+    setSelectedSubSubSubCategory(subSubSubCategory)
+    const questions = getQuestions(selectedCategory, selectedSubCategory, selectedSubSubCategory, subSubSubCategory)
+    const selectedQuestions = selectRandomQuestions(questions)
+    startSession(selectedQuestions)
+  }
+
+  const handleBack = () => {
+    switch (currentStep) {
+      case 'subcategory':
+        setCurrentStep('category')
+        setSelectedCategory('')
+        break
+      case 'subsubcategory':
+        setCurrentStep('subcategory')
+        setSelectedSubCategory('')
+        break
+      case 'subsubsubcategory':
+        setCurrentStep('subsubcategory')
+        setSelectedSubSubCategory('')
+        break
+      case 'interview':
+        handleBackToSetup()
+        break
+    }
+  }
+
   const RecordingInterface = () => {
-    const q: Question | undefined = currentSession?.questions?.[currentQuestionIndex]
+    const q = sessionQuestions[currentQuestionIndex]
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center px-6 py-8">
         {/* Question Title */}
         <div className="text-center mb-6 max-w-4xl">
           <h1 className="text-xl md:text-2xl font-semibold text-blue-600 mb-3 leading-relaxed">
-            {q?.text}
+            {q}
           </h1>
           <div className="mb-4">
-            <span className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of {currentSession?.questions?.length || 0}</span>
+            <span className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of {sessionQuestions.length}</span>
           </div>
           <div className="flex justify-center gap-2 mb-8">
-            {currentSession?.questions?.map((_: any, idx: number) => (
+            {sessionQuestions.map((_, idx) => (
               <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentQuestionIndex ? 'bg-blue-600' : idx < currentQuestionIndex ? 'bg-blue-300' : 'bg-gray-300'}`} />
             ))}
           </div>
@@ -330,9 +622,9 @@ export default function Practice({ onTabChange }: PracticeProps) {
                   <h3 className="text-lg text-gray-900 mb-4 font-normal">Listen to Question</h3>
                   <Button
                     onClick={async () => {
-                      if (!q?.text) return
+                      if (!q) return
                       try {
-                        const audioRes = await fetch(`/api/interview/analyze-audio?tts=1&text=${encodeURIComponent(q.text)}`)
+                        const audioRes = await fetch(`/api/interview/analyze-audio?tts=1&text=${encodeURIComponent(q)}`)
                         if (!audioRes.ok) return
                         const blob = await audioRes.blob()
                         const url = URL.createObjectURL(blob)
@@ -458,7 +750,7 @@ export default function Practice({ onTabChange }: PracticeProps) {
             <Button 
               onClick={() => {
                 // skip question without recording
-                if (currentSession && currentQuestionIndex < currentSession.questions.length - 1) {
+                if (currentQuestionIndex < sessionQuestions.length - 1) {
                   setCurrentQuestionIndex(currentQuestionIndex + 1)
                   resetRecording()
                 } else {
@@ -467,7 +759,8 @@ export default function Practice({ onTabChange }: PracticeProps) {
                 }
               }}
               variant="outline"
-              className="px-6 py-2 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white"
+              disabled={uploadStatus === 'uploading' || uploadStatus === 'analyzing' || isUploading}
+              className="px-6 py-2 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Skip This Question
             </Button>
@@ -477,7 +770,7 @@ export default function Practice({ onTabChange }: PracticeProps) {
                   uploadRecording()
                 } else {
                   // If nothing to upload, move next
-                  if (currentSession && currentQuestionIndex < currentSession.questions.length - 1) {
+                  if (currentQuestionIndex < sessionQuestions.length - 1) {
                     setCurrentQuestionIndex(currentQuestionIndex + 1)
                     resetRecording()
                   } else {
@@ -486,10 +779,13 @@ export default function Practice({ onTabChange }: PracticeProps) {
                   }
                 }
               }}
-              className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={uploadStatus === 'uploading' || uploadStatus === 'analyzing' || isUploading}
+              className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-blue-400"
             >
-              {currentSession && currentQuestionIndex === (currentSession.questions.length - 1) ? 'Finish' : 'Next Question'}
-              <ArrowRight className="h-4 w-4 ml-2" />
+              {uploadStatus === 'uploading' ? 'Uploading...' : 
+               uploadStatus === 'analyzing' ? 'Analyzing...' : 
+               currentQuestionIndex === (sessionQuestions.length - 1) ? 'Finish' : 'Next Question'}
+              {uploadStatus === 'idle' && <ArrowRight className="h-4 w-4 ml-2" />}
             </Button>
           </div>
         </div>
@@ -497,109 +793,345 @@ export default function Practice({ onTabChange }: PracticeProps) {
     )
   }
 
-  if (isInterviewStarted && currentSession) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading practice questions...</div>
+      </div>
+    )
+  }
+
+  // Recording Interface Component
+  if (currentStep === 'interview' && isInterviewStarted) {
     return <RecordingInterface />
   }
 
-  if (loadingSets) {
+  // Category selection view
+  if (currentStep === 'category') {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 rounded-full border-b-2 border-blue-600 animate-spin mx-auto" />
-          <p className="text-gray-600">Loading question sets...</p>
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice</h1>
+          <p className="text-gray-600 text-lg">Live mock interview exercises with AI feedback</p>
         </div>
-      </div>
-    )
-  }
 
-  if (fetchError) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <p className="text-red-600">{fetchError}</p>
-          <Button onClick={() => location.reload()} variant="outline">Try Again</Button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="container mx-auto px-6 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice</h1>
-        <p className="text-gray-600 text-lg">Live mock interview exercises with AI feedback</p>
-      </div>
-
-      {/* Mock Interview Setup */}
-      <Card3D>
-        <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
-          <div className="text-center mb-8">
-            <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4">
-              <Video className="h-8 w-8 text-blue-600" />
+        {/* Mock Interview Setup */}
+        <Card3D>
+          <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+            <div className="text-center mb-8">
+              <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4">
+                <Video className="h-8 w-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Mock Interview</h2>
+              <p className="text-gray-600">Select a category and start your practice session</p>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Live Mock Interview</h2>
-            <p className="text-gray-600">Select a question set and start your practice session</p>
-          </div>
 
-          <div className="max-w-4xl mx-auto">
-            {/* Question Set Selection */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Question Set</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {dbQuestionSets.map((set) => (
-                  <div
-                    key={set.id}
-                    onClick={() => startSession(set.id)}
-                    className="p-6 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md border-gray-200 bg-gray-50 hover:border-blue-300"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 p-3 bg-blue-50 rounded-full">
-                        <MessageSquare className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-gray-900 mb-2 font-medium">{set.name}</h4>
-                        <p className="text-sm text-gray-600">{set.description}</p>
-                        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-                          <Badge variant="secondary" className="capitalize">{set.category}</Badge>
-                          <Badge className={set.difficulty === 'easy' ? 'bg-green-100 text-green-800' : set.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}>
-                            {set.difficulty}
-                          </Badge>
-                          <span>{set.questions?.length || 0} questions</span>
+            <div className="max-w-4xl mx-auto">
+              {/* Category Selection */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Category</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {getCategories().map((category) => {
+                    const IconComponent = getCategoryIcon(category)
+                    return (
+                      <div
+                        key={category}
+                        onClick={() => handleCategorySelect(category)}
+                        className="p-6 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 p-3 bg-blue-50 rounded-full">
+                            <IconComponent className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-gray-900 mb-2 font-medium">{category}</h4>
+                            <p className="text-sm text-gray-600">
+                              {Object.keys(questionData[category] || {}).length} subcategories available
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* Interview Info */}
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center p-6 bg-blue-50 rounded-lg">
-                <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                <div className="text-gray-900 text-lg font-semibold">Multiple Questions</div>
-                <div className="text-sm text-gray-600">Per session</div>
+              {/* Interview Info */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">5 Questions</div>
+                  <div className="text-sm text-gray-600">Per session</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-lg">
+                  <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">15-20 mins</div>
+                  <div className="text-sm text-gray-600">Estimated duration</div>
+                </div>
+                <div className="text-center p-6 bg-purple-50 rounded-lg">
+                  <Star className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">AI Feedback</div>
+                  <div className="text-sm text-gray-600">Instant analysis</div>
+                </div>
               </div>
-              <div className="text-center p-6 bg-green-50 rounded-lg">
-                <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <div className="text-gray-900 text-lg font-semibold">15-20 mins</div>
-                <div className="text-sm text-gray-600">Estimated duration</div>
-              </div>
-              <div className="text-center p-6 bg-purple-50 rounded-lg">
-                <Star className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-                <div className="text-gray-900 text-lg font-semibold">AI Feedback</div>
-                <div className="text-sm text-gray-600">Instant analysis</div>
-              </div>
-            </div>
 
-            {/* Note about selection */}
-            <div className="text-center text-gray-500 text-sm">
-              Choose a question set above to continue
+              {/* Note about selection */}
+              <div className="text-center text-gray-500 text-sm">
+                Select a category above to continue
+              </div>
             </div>
           </div>
+        </Card3D>
+      </div>
+    )
+  }
+
+  // Subcategory selection view
+  if (currentStep === 'subcategory') {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" onClick={handleBack} className="mb-4">
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Back to Categories
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice</h1>
+          <p className="text-gray-600 text-lg">Live mock interview exercises with AI feedback</p>
         </div>
-      </Card3D>
-    </div>
-  )
+
+        {/* Sub-category Selection */}
+        <Card3D>
+          <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+            <div className="text-center mb-8">
+              <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4">
+                <Globe className="h-8 w-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedCategory}</h2>
+              <p className="text-gray-600">Choose a subcategory to continue</p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              {/* Sub-categories */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Sub-Category</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {getSubCategories(selectedCategory).map((subCategory) => (
+                    <div
+                      key={subCategory}
+                      onClick={() => handleSubCategorySelect(subCategory)}
+                      className="px-4 py-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      <span className="text-sm text-gray-700 font-medium">{subCategory}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interview Info */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">5 Questions</div>
+                  <div className="text-sm text-gray-600">Per session</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-lg">
+                  <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">15-20 mins</div>
+                  <div className="text-sm text-gray-600">Estimated duration</div>
+                </div>
+                <div className="text-center p-6 bg-purple-50 rounded-lg">
+                  <Star className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">AI Feedback</div>
+                  <div className="text-sm text-gray-600">Instant analysis</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="px-8 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+                <div className="text-center text-gray-500 text-sm flex items-center">
+                  Select a subcategory above to continue
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card3D>
+      </div>
+    )
+  }
+
+  // Sub-subcategory selection view
+  if (currentStep === 'subsubcategory') {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" onClick={handleBack} className="mb-4">
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Back to {selectedCategory}
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice</h1>
+          <p className="text-gray-600 text-lg">Live mock interview exercises with AI feedback</p>
+        </div>
+
+        {/* Sub-category Selection */}
+        <Card3D>
+          <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+            <div className="text-center mb-8">
+              <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4">
+                <Globe className="h-8 w-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedSubCategory}</h2>
+              <p className="text-gray-600">Choose a specific area</p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              {/* Sub-categories */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Area</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {getSubSubCategories(selectedCategory, selectedSubCategory).map((subSubCategory) => (
+                    <div
+                      key={subSubCategory}
+                      onClick={() => handleSubSubCategorySelect(subSubCategory)}
+                      className="px-4 py-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      <span className="text-sm text-gray-700 font-medium">{subSubCategory}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interview Info */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">5 Questions</div>
+                  <div className="text-sm text-gray-600">Per session</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-lg">
+                  <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">15-20 mins</div>
+                  <div className="text-sm text-gray-600">Estimated duration</div>
+                </div>
+                <div className="text-center p-6 bg-purple-50 rounded-lg">
+                  <Star className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">AI Feedback</div>
+                  <div className="text-sm text-gray-600">Instant analysis</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="px-8 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+                <div className="text-center text-gray-500 text-sm flex items-center">
+                  Select an area above to continue
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card3D>
+      </div>
+    )
+  }
+
+  // Sub-sub-subcategory selection view
+  if (currentStep === 'subsubsubcategory') {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" onClick={handleBack} className="mb-4">
+            <ChevronLeft className="w-4 w-4 mr-2" />
+            Back to {selectedSubCategory}
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice</h1>
+          <p className="text-gray-600 text-lg">Live mock interview exercises with AI feedback</p>
+        </div>
+
+        {/* Sub-category Selection */}
+        <Card3D>
+          <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
+            <div className="text-center mb-8">
+              <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4">
+                <Globe className="h-8 w-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedSubSubCategory}</h2>
+              <p className="text-gray-600">Choose a specific specialization</p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              {/* Sub-categories */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Specialization</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {getSubSubSubCategories(selectedCategory, selectedSubCategory, selectedSubSubCategory).map((subSubSubCategory) => (
+                    <div
+                      key={subSubSubCategory}
+                      onClick={() => handleSubSubSubCategorySelect(subSubSubCategory)}
+                      className="px-4 py-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      <span className="text-sm text-gray-700 font-medium">{subSubSubCategory}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interview Info */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">5 Questions</div>
+                  <div className="text-sm text-gray-600">Per session</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-lg">
+                  <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">15-20 mins</div>
+                  <div className="text-sm text-gray-600">Estimated duration</div>
+                </div>
+                <div className="text-center p-6 bg-purple-50 rounded-lg">
+                  <Star className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                  <div className="text-gray-900 text-lg font-semibold">AI Feedback</div>
+                  <div className="text-sm text-gray-600">Instant analysis</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="px-8 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 bg-white"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+                <div className="text-center text-gray-500 text-sm flex items-center">
+                  Select a specialization above to continue
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card3D>
+      </div>
+    )
+  }
+
+  return null
 }
