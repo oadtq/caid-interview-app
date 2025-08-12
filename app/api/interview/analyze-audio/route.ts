@@ -54,8 +54,9 @@ export async function POST(request: NextRequest) {
     // Ask for rich, structured feedback compatible with the new UI
     const analysisPrompt = `
 You are an expert interview coach analyzing a candidate's response to an interview question.
-The candidate is a student at VinUniversity from Vietnam.
+The candidate is a student at VinUniversity from Vietnam applying for entry-level or internship positions.
 Return feedback in a rich detailed format used by a frontend dashboard.
+You should be strict in scoring and detailed in feedback so that students can significantly improve their skills.
 
 Question: "${questionText}"
 Response: "${transcribedText}"
@@ -78,6 +79,8 @@ Return STRICT JSON with top-level keys:
     "strengths": string[],
     "improvements": string[]
   }
+
+If users don't use power words, give them some examples of power words in the tips list.
 
 Rules:
 - overallPerformance.score is 0-100.
