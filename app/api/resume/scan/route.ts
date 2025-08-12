@@ -81,8 +81,8 @@ Please provide a detailed analysis with scores (1-10) and specific feedback for 
 
 For each criterion, provide:
 - A numerical score (1-10)
-- Specific feedback explaining the score
-- Multiple specific feedback categories with recommendations
+- Specific feedback explaining the score, pointing out directly evidence in resume
+- Multiple specific feedback categories with recommendations, with revision from resume
 
 Please respond in JSON format:
 {
@@ -94,25 +94,25 @@ Please respond in JSON format:
       {
         "name": "Summary Statement",
         "status": "error|warning|success",
-        "details": "specific feedback about summary",
+        "details": "specific feedback about summary, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Work Experience",
         "status": "error|warning|success", 
-        "details": "specific feedback about experience",
+        "details": "specific feedback about experience, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Skills Section",
         "status": "error|warning|success",
-        "details": "specific feedback about skills",
+        "details": "specific feedback about skills, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Education",
         "status": "error|warning|success",
-        "details": "specific feedback about education",
+        "details": "specific feedback about education, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       }
     ]
@@ -184,32 +184,32 @@ Please respond in JSON format:
       {
         "name": "Quantified Results",
         "status": "error|warning|success",
-        "details": "specific feedback about metrics",
+        "details": "specific feedback about metrics, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Project Impact",
         "status": "error|warning|success",
-        "details": "specific feedback about project impact",
+        "details": "specific feedback about project impact, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Leadership Examples",
         "status": "error|warning|success",
-        "details": "specific feedback about leadership",
+        "details": "specific feedback about leadership, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       },
       {
         "name": "Problem Solving",
         "status": "error|warning|success",
-        "details": "specific feedback about problem solving",
+        "details": "specific feedback about problem solving, pointing out directly from resume",
         "recommendations": ["rec 1", "rec 2", "rec 3"]
       }
     ]
   },
   "strengths": ["strength 1", "strength 2", "strength 3"],
   "areas_for_improvement": ["improvement 1", "improvement 2", "improvement 3"],
-  "overall_summary": "comprehensive summary and recommendations"
+  "overall_summary": "comprehensive summary and recommendations, pointing out directly from resume"
 }
 `
 

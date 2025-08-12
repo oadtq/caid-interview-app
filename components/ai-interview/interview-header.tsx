@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { LogOut, User, ChevronDown, ArrowLeft, BookOpen, MessageSquare, Award } from 'lucide-react'
+import { LogOut, User, ChevronDown, ArrowLeft, BookOpen, MessageSquare } from 'lucide-react'
 
 interface InterviewHeaderProps {
   activeTab: string
@@ -38,12 +38,6 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
           description: "Browse all our question guides and answers",
           icon: MessageSquare,
         },
-        {
-          id: "certificates",
-          label: "Certificates",
-          description: "View earned certificates",
-          icon: Award,
-        },
       ],
     },
     { id: "practice", label: "Practice" },
@@ -68,6 +62,15 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
     setShowCurriculumDropdown(false)
   }
 
+  // Helper to determine if a tab is active, for both main and dropdown items
+  const isTabActive = (tab: any) => {
+    if (!tab.hasDropdown) {
+      return activeTab === tab.id
+    }
+    // Only check for curriculum and question-sets
+    return activeTab === "curriculum" || activeTab === "question-sets"
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
@@ -90,11 +93,7 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
                 <button
                   onClick={() => handleTabClick(tab)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors relative flex items-center gap-1 ${
-                    activeTab === tab.id ||
-                    (
-                      tab.hasDropdown &&
-                        (activeTab === "curriculum" || activeTab === "question-sets" || activeTab === "certificates")
-                    )
+                    isTabActive(tab)
                       ? "text-primary bg-primary/10"
                       : "text-gray-600 hover:text-primary hover:bg-gray-50"
                   }`}
@@ -105,11 +104,7 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
                       className={`h-3 w-3 transition-transform ${showCurriculumDropdown ? "rotate-180" : ""}`}
                     />
                   )}
-                  {(activeTab === tab.id ||
-                    (tab.hasDropdown &&
-                      (activeTab === "curriculum" ||
-                        activeTab === "question-sets" ||
-                        activeTab === "certificates"))) && (
+                  {isTabActive(tab) && (
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
                   )}
                 </button>
@@ -123,12 +118,8 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
                         onClick={() => handleDropdownItemClick(item.id)}
                         className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3"
                       >
-                        <div
-                          className={`p-2 rounded-lg mt-1 ${item.id === "certificates" ? "bg-blue-50" : "bg-blue-50"}`}
-                        >
-                          <item.icon
-                            className={`h-5 w-5 ${item.id === "certificates" ? "text-blue-600" : "text-blue-600"}`}
-                          />
+                        <div className="p-2 rounded-lg mt-1 bg-blue-50">
+                          <item.icon className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
                           <div className="font-medium text-gray-900 mb-1">{item.label}</div>
@@ -193,11 +184,7 @@ export function InterviewHeader({ activeTab, onTabChange, onLogout, userInfo }: 
               key={tab.id}
               onClick={() => handleTabClick(tab)}
               className={`flex-shrink-0 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
-                activeTab === tab.id ||
-                (
-                  tab.hasDropdown &&
-                    (activeTab === "curriculum" || activeTab === "question-sets" || activeTab === "certificates")
-                )
+                isTabActive(tab)
                   ? "text-primary bg-primary/10"
                   : "text-gray-600 hover:text-primary hover:bg-gray-50"
               }`}
