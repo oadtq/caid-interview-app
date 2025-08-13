@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
     // Analyze resume with GPT-4o-mini
     const analysisPrompt = `
 You are an expert resume reviewer and career coach. Analyze the following resume and provide comprehensive feedback.
+The candidate is a student at VinUniversity from Vietnam applying for entry-level or internship positions.
+You should be strict in scoring and very detailed in feedback so that students can significantly improve their resume.
 
 Resume Content:
 ${extractedText}

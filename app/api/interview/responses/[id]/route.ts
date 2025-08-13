@@ -26,8 +26,8 @@ function parseStoragePathFromPublicUrl(url: string | null): { bucket: string; pa
 
 export async function DELETE(request: Request, context: any) {
   try {
-    const { params } = context as { params: { id: string } }
-    const id = params.id
+    const { params } = context as { params: Promise<{ id: string }> }
+    const id = (await params).id
 
     // Fetch record to get video URL and session id
     const { data: record, error: fetchErr } = await supabase

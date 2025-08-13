@@ -182,11 +182,46 @@ export function MyVideos() {
     const powerWordList = ['led','owned','delivered','achieved','improved','implemented','designed','launched','optimized','streamlined','innovated','mentored','built','created','managed']
     const usedPowerWords = powerWordList.filter(w => new RegExp(`\\b${w}\\b`, 'i').test(lower))
 
-    const overallScorePct = toPercent(r.overall_score)
+    const contentQualityScorePct = toPercent(r.ai_feedback?.content_quality?.score)
+    const communicationScorePct = toPercent(r.ai_feedback?.communication_skills?.score)
+    const professionalismScorePct = toPercent(r.ai_feedback?.professionalism?.score)
+    const examplesScorePct = toPercent(r.ai_feedback?.use_of_examples?.score)
+
+    // Calculate individual criteria scores
+    const answerRelevanceScore = contentQualityScorePct
+    const paceOfSpeechScore = (() => {
+      // ideal range 115-180
+      if (wpm >= 115 && wpm <= 180) return 90
+      if (wpm >= 95 && wpm <= 200) return 75
+      return 55
+    })()
+    const umCounterScore = umPer100 <= 2 ? 95 : umPer100 <= 5 ? 75 : 55
+    const vocabularyScore = communicationScorePct || 80
+    const powerWordsScore = usedPowerWords.length >= 8 ? 90 : usedPowerWords.length >= 4 ? 75 : 60
+    const fillerWordsScore = per100 <= 2 ? 95 : per100 <= 5 ? 75 : 55
+    const pauseCounterScore = 85
+    const negativeToneScore = negPhrases.length === 0 ? 98 : negPhrases.length <= 2 ? 80 : 60
+    const lengthScore = durationSec >= 60 && durationSec <= 120 ? 95 : durationSec >= 45 && durationSec <= 150 ? 80 : 60
+    const authenticityScoreValue = 90
+
+    // Calculate overall performance as average of all criteria
+    const criteriaScores = [
+      answerRelevanceScore,
+      paceOfSpeechScore,
+      umCounterScore,
+      vocabularyScore,
+      powerWordsScore,
+      fillerWordsScore,
+      pauseCounterScore,
+      negativeToneScore,
+      lengthScore,
+      authenticityScoreValue
+    ]
+    const overallPerformanceScore = Math.round(criteriaScores.reduce((sum, score) => sum + score, 0) / criteriaScores.length)
 
     const overallPerformance: DetailedFeedback['overallPerformance'] = {
-      score: overallScorePct,
-      status: calcStatus(overallScorePct),
+      score: overallPerformanceScore,
+      status: calcStatus(overallPerformanceScore),
       summary: (r.ai_feedback?.overall_feedback as string) || 'Overall performance summary',
       description: 'Overall performance across content, delivery, and professionalism.',
       detailedAnalysis: (r.ai_feedback?.overall_feedback as string) || 'Good foundation with room for improvement.',
@@ -195,14 +230,9 @@ export function MyVideos() {
       overallSummary: (r.ai_feedback?.overall_feedback as string) || 'Overall feedback'
     }
 
-    const contentQualityScorePct = toPercent(r.ai_feedback?.content_quality?.score)
-    const communicationScorePct = toPercent(r.ai_feedback?.communication_skills?.score)
-    const professionalismScorePct = toPercent(r.ai_feedback?.professionalism?.score)
-    const examplesScorePct = toPercent(r.ai_feedback?.use_of_examples?.score)
-
     const answerRelevance: DetailedFeedback['answerRelevance'] = {
-      score: contentQualityScorePct,
-      status: calcStatus(contentQualityScorePct),
+      score: answerRelevanceScore,
+      status: calcStatus(answerRelevanceScore),
       summary: r.ai_feedback?.content_quality?.feedback || 'Addresses the question with relevant details.',
       description: 'Measures how well the response addresses the question and stays on topic.',
       detailedAnalysis: r.ai_feedback?.content_quality?.feedback || 'Focused and relevant response.',
@@ -211,12 +241,7 @@ export function MyVideos() {
     }
 
     const paceOfSpeech: DetailedFeedback['paceOfSpeech'] = {
-      score: (() => {
-        // ideal range 115-180
-        if (wpm >= 115 && wpm <= 180) return 90
-        if (wpm >= 95 && wpm <= 200) return 75
-        return 55
-      })(),
+      score: paceOfSpeechScore,
       status: (() => {
         if (wpm >= 115 && wpm <= 180) return 'good'
         if (wpm >= 95 && wpm <= 200) return 'caution'
@@ -232,7 +257,7 @@ export function MyVideos() {
     }
 
     const umCounter: DetailedFeedback['umCounter'] = {
-      score: umPer100 <= 2 ? 95 : umPer100 <= 5 ? 75 : 55,
+      score: umCounterScore,
       status: umPer100 <= 2 ? 'excellent' : umPer100 <= 5 ? 'good' : 'caution',
       summary: `${disfluencyCount} disfluencies (${umPer100} per 100 words)`,
       description: 'Counts disfluencies like um/uh/er/ah.',
@@ -244,8 +269,8 @@ export function MyVideos() {
     }
 
     const vocabulary: DetailedFeedback['vocabulary'] = {
-      score: communicationScorePct || 80,
-      status: calcStatus(communicationScorePct || 80),
+      score: vocabularyScore,
+      status: calcStatus(vocabularyScore),
       summary: 'Appropriate professional vocabulary',
       description: 'Sophistication and appropriateness of word choice.',
       detailedAnalysis: r.ai_feedback?.communication_skills?.feedback || 'Clear and professional language.',
@@ -256,7 +281,7 @@ export function MyVideos() {
     }
 
     const powerWords: DetailedFeedback['powerWords'] = {
-      score: usedPowerWords.length >= 8 ? 90 : usedPowerWords.length >= 4 ? 75 : 60,
+      score: powerWordsScore,
       status: usedPowerWords.length >= 8 ? 'excellent' : usedPowerWords.length >= 4 ? 'good' : 'caution',
       summary: `Detected ${usedPowerWords.length} power words`,
       description: 'Use of strong, action-oriented language.',
@@ -268,7 +293,7 @@ export function MyVideos() {
     }
 
     const fillerWords: DetailedFeedback['fillerWords'] = {
-      score: per100 <= 2 ? 95 : per100 <= 5 ? 75 : 55,
+      score: fillerWordsScore,
       status: per100 <= 2 ? 'excellent' : per100 <= 5 ? 'good' : 'caution',
       summary: `${fillerCount} filler words (${per100} per 100 words)`,
       description: 'Non-essential words that weaken messages.',
@@ -281,7 +306,7 @@ export function MyVideos() {
     }
 
     const pauseCounter: DetailedFeedback['pauseCounter'] = {
-      score: 85,
+      score: pauseCounterScore,
       status: 'excellent',
       summary: 'Natural use of pauses',
       description: 'Strategic pauses for emphasis and rhythm.',
@@ -292,7 +317,7 @@ export function MyVideos() {
     }
 
     const negativeTone: DetailedFeedback['negativeTone'] = {
-      score: negPhrases.length === 0 ? 98 : negPhrases.length <= 2 ? 80 : 60,
+      score: negativeToneScore,
       status: negPhrases.length === 0 ? 'excellent' : negPhrases.length <= 2 ? 'good' : 'caution',
       summary: negPhrases.length === 0 ? 'No negative language detected' : `${negPhrases.length} negative phrases detected`,
       description: 'Presence of negative or pessimistic language.',
@@ -304,7 +329,7 @@ export function MyVideos() {
     }
 
     const length: DetailedFeedback['length'] = {
-      score: durationSec >= 60 && durationSec <= 120 ? 95 : durationSec >= 45 && durationSec <= 150 ? 80 : 60,
+      score: lengthScore,
       status: durationSec >= 60 && durationSec <= 120 ? 'excellent' : durationSec >= 45 && durationSec <= 150 ? 'good' : 'caution',
       summary: `Duration ${formatDuration(durationSec)}`,
       description: 'Appropriate response duration for the question type.',
@@ -317,7 +342,7 @@ export function MyVideos() {
     }
 
     const authenticityScore: DetailedFeedback['authenticityScore'] = {
-      score: 90,
+      score: authenticityScoreValue,
       status: 'excellent',
       summary: 'Conversational and genuine delivery',
       description: 'Naturalness vs. sounding scripted.',
@@ -345,16 +370,19 @@ export function MyVideos() {
   }
 
   const savedAnswers: VideoAnswer[] = useMemo(() => {
-    return (responses || []).map((r) => ({
-      id: r.id,
-      question: r.question_text,
-      recordedAt: new Date(r.created_at).toISOString().slice(0, 10),
-      duration: formatDuration(r.duration ?? undefined),
-      videoUrl: r.video_url ?? undefined,
-      overallScore: toPercent(r.overall_score),
-      detailedFeedback: normalizeFeedback(r),
-      transcription: r.transcription ?? undefined
-    }))
+    return (responses || []).map((r) => {
+      const feedback = normalizeFeedback(r)
+      return {
+        id: r.id,
+        question: r.question_text,
+        recordedAt: new Date(r.created_at).toISOString().slice(0, 10),
+        duration: formatDuration(r.duration ?? undefined),
+        videoUrl: r.video_url ?? undefined,
+        overallScore: feedback.overallPerformance.score,
+        detailedFeedback: feedback,
+        transcription: r.transcription ?? undefined
+      }
+    })
   }, [responses])
 
   const handleViewFeedback = (videoId: string) => {
