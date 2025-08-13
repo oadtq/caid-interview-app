@@ -139,7 +139,7 @@ export function InterviewHome({ onTabChange }: { onTabChange?: (tab: string) => 
   const getRecentActivity = (): RecentActivity[] => {
     return responses.slice(0, 4).map(response => {
       const timeAgo = getTimeAgo(new Date(response.created_at))
-      const score = response.overall_score ? Math.round(response.overall_score * 10) : null
+      const score = response.overall_score ? Math.round(response.overall_score) : null
       
       return {
         action: `Completed ${response.interview_sessions?.session_name || 'Practice Session'}`,

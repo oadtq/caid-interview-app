@@ -57,6 +57,7 @@ You are an expert interview coach analyzing a candidate's response to an intervi
 The candidate is a student at VinUniversity from Vietnam applying for entry-level or internship positions.
 Return feedback in a rich detailed format used by a frontend dashboard.
 You should be strict in scoring and detailed in feedback so that students can significantly improve their skills.
+You should give students detailed tips to improve their responses, including sample answers or words to use that can boost their responses.
 
 Question: "${questionText}"
 Response: "${transcribedText}"
@@ -65,7 +66,7 @@ First infer: total words, duration in seconds if you can from speech pacing (ass
 
 Return STRICT JSON with top-level keys:
   {
-    "overallPerformance": { "score": number (0-100), "status": "excellent"|"good"|"caution"|"poor", "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[], "overallSummary": string },
+    "overallPerformance": { "score": number (0-100), "status": "excellent"|"good"|"caution"|"poor", "summary": string (very detailed summary, minimum 4 sentences), "description": string (comprehensive; minimum 5 sentences), "detailedAnalysis": string (in-depth; minimum 6 sentences), "examples": string[] (minimum 4, each at least 2 sentences), "tips": string[] (minimum 6, each with 2 or more sentences, actionable and highly detailed), "overallSummary": string },
     "answerRelevance": { "score": number, "status": string, "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[] },
     "paceOfSpeech": { "score": number, "status": string, "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[], "wpm": number, "optimalRange": string },
     "umCounter": { "score": number, "status": string, "summary": string, "description": string, "detailedAnalysis": string, "examples": string[], "tips": string[], "count": number, "per100Words": number },
@@ -80,14 +81,14 @@ Return STRICT JSON with top-level keys:
     "improvements": string[]
   }
 
-If users don't use power words, give them some examples of power words in the tips list.
+If users don't use a power word, give them some examples of power words they can use in the tips.
 
 Rules:
 - overallPerformance.score is 0-100.
 - Map statuses by score: >=85 excellent, >=70 good, >=50 caution, else poor.
 - If duration seconds unknown, estimate by words/150*60.
 - per100Words = round((count/totalWords)*100, 2). If totalWords is 0, return 0.
-- All strings must be detailed, professional, and actionable.
+- All strings must be highly detailed, professional, actionable, and much longer than a standard response.
 
 Respond with JSON only.`
 
@@ -104,7 +105,6 @@ Respond with JSON only.`
         }
       ],
       temperature: 0.3,
-      max_tokens: 1800
     })
 
     let parsed: any = null
